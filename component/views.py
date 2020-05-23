@@ -68,9 +68,7 @@ def upload(request):
         else:
             envtype = 'offline'
         file = request.FILES.get('file', None)
-        print(file.size)
         size = round((int(file.size) / 1024 / 1024), 2)
-        print(size)
         if file is None:
             return HttpResponse('没有需要上传的文件')
         else:
@@ -83,6 +81,7 @@ def upload(request):
                 envtype = 0
 
             ###解析apk文件 放在上传之后 否则上传的文件不可用
+            print(file, type(file))
             apk = unpack.parse_apk(file)
              # 文件大小
 
@@ -93,5 +92,5 @@ def upload(request):
                                           size=size,
                                           owner=owner,
                                           url=str(url))
-            finaldata = {'code': 0, 'msg': 'success'}
+            finaldata = {'code': 2001, 'msg': 'success'}
     return JsonResponse(finaldata)

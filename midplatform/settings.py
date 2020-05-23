@@ -158,6 +158,7 @@ STATICFILES_DIRS=[
 RESULT = {"code":None,"msg":None,"count":None,"data":[]}
 
 
+
 ###自定义状态码以及message信息
 
 CodeMsg = {
