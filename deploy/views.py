@@ -30,20 +30,27 @@ def getallrecord(request):
     ProjectName = request.GET.get('ProjectName')
     Publisher = request.GET.get('Publisher')
 
+    kwargs = {
+    # 动态查询的字段
+    }
     if Publisher != None and ProjectName != None:
-        count = models.DeployRecord.objects.filter(ProjectName=ProjectName, Publisher=Publisher).count()
-        res = models.DeployRecord.objects.filter(ProjectName=ProjectName, Publisher=Publisher).order_by('-DeployTime')
+        kwargs['Publisher'] = Publisher
+        kwargs['ProjectName'] = ProjectName
 
-    if ProjectName != None:
-        count = models.DeployRecord.objects.filter(ProjectName=ProjectName).count()
-        res = models.DeployRecord.objects.filter(ProjectName=ProjectName).order_by('-DeployTime').values()
+    elif ProjectName != None:
+        kwargs['ProjectName'] = ProjectName
 
-    if Publisher != None :
-        count = models.DeployRecord.objects.filter(Publisher=Publisher).count()
-        res = models.DeployRecord.objects.filter(Publisher=Publisher).order_by('-DeployTime')
+    elif Publisher != None :
+        kwargs['Publisher'] = Publisher
+    else:
+        count = models.DeployRecord.objects.filter(**kwargs).count()
+        res = models.DeployRecord.objects.filter(**kwargs).order_by('-DeployTime')[start:stop].values()
+
+    count = models.DeployRecord.objects.filter(**kwargs).count()
+    res = models.DeployRecord.objects.filter(**kwargs).order_by('-DeployTime')[start:stop].values()
 
     datalist = list(res)
-    if len(res) > 0:
+    if count > 0:
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
@@ -66,6 +73,7 @@ def addrecord(request):
                 res[i] = 1
             else:
                 res[i] = 0
+        print(res,type(res))
         models.DeployRecord.objects.create(ProjectName=res['ProjectName'],
                                            isRollBack=res['isRollBack'],
                                            ModifyModel=res['ModifyModel'],
@@ -78,9 +86,8 @@ def addrecord(request):
                                            isModifySql=res['isModifySql'],
                                            SqlDetail=res['SqlDetail'])
         front_respone = {'code': 2001, 'msg': None}
-
         front_respone['msg'] = 'success'
-        # dingtalkmsg(res, 0,0)
+        dingtalkmsg(res, 0,0)
         return JsonResponse(front_respone)
 
 
@@ -92,8 +99,7 @@ def editrecord(request):
     models.DeployRecord.objects.filter(pk=res['id']).update(state=res['state'], FinishTime=FinishTime,
                                                             ElapsedTime=proTime(res))
     data = model_to_dict(models.DeployRecord.objects.get(pk=res['id']))
-
-    # dingtalkmsg(data, res['state'])
+    dingtalkmsg(data, res['state'])
     front_respone['msg'] = 'success'
     return JsonResponse(front_respone)
 
