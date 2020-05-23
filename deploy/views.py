@@ -34,48 +34,26 @@ def getallrecord(request):
         count = models.DeployRecord.objects.filter(ProjectName=ProjectName, Publisher=Publisher).count()
         res = models.DeployRecord.objects.filter(ProjectName=ProjectName, Publisher=Publisher).order_by('-DeployTime')
 
-    if Publisher == '' and ProjectName != None:
+    if ProjectName != None:
         count = models.DeployRecord.objects.filter(ProjectName=ProjectName).count()
-        res = models.DeployRecord.objects.filter(ProjectName=ProjectName).order_by('-DeployTime')
+        res = models.DeployRecord.objects.filter(ProjectName=ProjectName).order_by('-DeployTime').values()
 
-    if Publisher != None and ProjectName == '':
+    if Publisher != None :
         count = models.DeployRecord.objects.filter(Publisher=Publisher).count()
         res = models.DeployRecord.objects.filter(Publisher=Publisher).order_by('-DeployTime')
 
-    if (ProjectName == '' and Publisher == '') or (ProjectName == None and Publisher == None):
-        count = models.DeployRecord.objects.count()
-        res = models.DeployRecord.objects.all().order_by('-DeployTime')[start:stop]
-        # print(res)
+    datalist = list(res)
     if len(res) > 0:
-        datalist = []
-        for i in range(len(res)):
-            initData = {"id": None, "ProjectName": None, "isRollBack": None, "ModifyModel": None,
-                        "ModifyContent": None, "state": None, "Publisher": None, "DeployTime": None,
-                        "isModifyCache": None,
-                        "CacheDetail": None, "isModifySql": None, "SqlDetail": None}
-            initData['id'] = res[i].id
-            initData['ProjectName'] = res[i].ProjectName
-            initData['isRollBack'] = res[i].isRollBack
-            initData['ModifyModel'] = res[i].ModifyModel
-            initData['ModifyContent'] = res[i].ModifyContent
-            initData['state'] = res[i].state
-            initData['Publisher'] = res[i].Publisher
-            initData['DeployTime'] = res[i].DeployTime.strftime('%Y-%m-%d %H:%M:%S')
-            initData['isModifyCache'] = res[i].isModifyCache
-            initData['CacheDetail'] = res[i].CacheDetail
-            initData['isModifySql'] = res[i].isModifySql
-            initData['SqlDetail'] = res[i].SqlDetail
-            datalist.append(initData)
-        settings.RESULT['code'] = 0
+        settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
-        data = json.dumps(settings.RESULT)
-        return HttpResponse(data)
     else:
+        del settings.RESULT['count']
+        del settings.RESULT['data']
+        settings.RESULT['code'] = 2002
         settings.RESULT['msg'] = "fail"
-        print(settings.RESULT)
-    return HttpResponse("fail")
+    return JsonResponse(settings.RESULT)
 
 
 def addrecord(request):
