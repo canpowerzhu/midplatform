@@ -1,8 +1,8 @@
 from django.db import models
 # from django.contrib.postgres.fields import JSONField
 import jsonfield
-# from django_mysql
-# Create your models here.
+from django.db.backends.mysql.base import DatabaseWrapper
+DatabaseWrapper.data_types = DatabaseWrapper._data_types
 
 
 

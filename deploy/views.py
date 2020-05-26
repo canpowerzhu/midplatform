@@ -27,27 +27,27 @@ def getallrecord(request):
         start = (page - 1) * limit
         stop = limit * page
 
-    ProjectName = request.GET.get('ProjectName')
-    Publisher = request.GET.get('Publisher')
+    projectName = request.GET.get('projectName')
+    publisher = request.GET.get('publisher')
 
     kwargs = {
     # 动态查询的字段
     }
-    if Publisher != None and ProjectName != None:
-        kwargs['Publisher'] = Publisher
-        kwargs['ProjectName'] = ProjectName
+    if publisher != None and projectName != None:
+        kwargs['publisher'] = publisher
+        kwargs['projectName'] = projectName
 
-    elif ProjectName != None:
-        kwargs['ProjectName'] = ProjectName
+    elif projectName != None:
+        kwargs['ProjectName'] = projectName
 
-    elif Publisher != None :
-        kwargs['Publisher'] = Publisher
+    elif publisher != None :
+        kwargs['Publisher'] = publisher
     else:
-        count = models.DeployRecord.objects.filter(**kwargs).count()
-        res = models.DeployRecord.objects.filter(**kwargs).order_by('-DeployTime')[start:stop].values()
+        count = models.deployRecord.objects.filter(**kwargs).count()
+        res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime')[start:stop].values()
 
-    count = models.DeployRecord.objects.filter(**kwargs).count()
-    res = models.DeployRecord.objects.filter(**kwargs).order_by('-DeployTime')[start:stop].values()
+    count = models.deployRecord.objects.filter(**kwargs).count()
+    res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime')[start:stop].values()
 
     datalist = list(res)
     if count > 0:
@@ -55,9 +55,10 @@ def getallrecord(request):
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
+        print(datalist)
     else:
-        del settings.RESULT['count']
-        del settings.RESULT['data']
+        # del settings.RESULT['count']
+        # del settings.RESULT['data']
         settings.RESULT['code'] = 2002
         settings.RESULT['msg'] = "fail"
     return JsonResponse(settings.RESULT)
@@ -66,28 +67,29 @@ def getallrecord(request):
 def addrecord(request):
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
-        # 这里转换前端传来的开关状态值 为0 or 1
-        transferlist = ['isModifyCache', 'isModifySql', 'isRollBack', 'state']
-        for i in transferlist:
-            if i in res:
-                res[i] = 1
-            else:
-                res[i] = 0
-        print(res,type(res))
-        models.DeployRecord.objects.create(ProjectName=res['ProjectName'],
-                                           isRollBack=res['isRollBack'],
-                                           ModifyModel=res['ModifyModel'],
-                                           ModifyContent=res['ModifyContent'],
-                                           ###新增的记录状态均为未处理
-                                           state=0,
-                                           Publisher=res['Publisher'],
-                                           isModifyCache=res['isModifyCache'],
-                                           CacheDetail=res['CacheDetail'],
-                                           isModifySql=res['isModifySql'],
-                                           SqlDetail=res['SqlDetail'])
+        kwargs ={
+            ##动态参数
+        }
+        if 'isModifyCache' in res.keys():
+            kwargs['isModifyCache'] = 1
+            kwargs['cacheDetail'] = res['cacheDetail']
+
+        if 'isModifySql' in res.keys():
+            kwargs['isModifySql'] = 1
+            kwargs['sqlDetail'] = res['sqlDetail']
+
+        kwargs['projectName'] =res['projectName']
+        kwargs['isRollBack'] =res['isRollBack']
+        kwargs['modifyModel'] =res['modifyModel']
+        kwargs['modifyContent'] =res['modifyContent']
+        kwargs['state'] = 0
+        kwargs['publisher'] =res['publisher']
+
+
+        models.deployRecord.objects.create(**kwargs)
         front_respone = {'code': 2001, 'msg': None}
         front_respone['msg'] = 'success'
-        dingtalkmsg(res, 0,0)
+        dingtalkmsg(res, 0)
         return JsonResponse(front_respone)
 
 
@@ -95,11 +97,11 @@ def editrecord(request):
     front_respone = {'code': 2001, 'msg': None}
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
-    FinishTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    models.DeployRecord.objects.filter(pk=res['id']).update(state=res['state'], FinishTime=FinishTime,
-                                                            ElapsedTime=proTime(res))
-    data = model_to_dict(models.DeployRecord.objects.get(pk=res['id']))
-    dingtalkmsg(data, res['state'])
+    finishTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+    models.deployRecord.objects.filter(pk=res['id']).update(state=res['state'], finishTime=finishTime,
+                                                            elapsedTime=proTime(res))
+    data = model_to_dict(models.deployRecord.objects.get(pk=res['id']))
+    dingtalkmsg(data, int(res['state']))
     front_respone['msg'] = 'success'
     return JsonResponse(front_respone)
 
@@ -114,21 +116,20 @@ def dingtalkmsg(data, type):
     from project import models
     # from project.models import ProjectName
     headers = {'Content-Type': 'application/json;charset=utf-8'}
-    logo = models.ProjectName.objects.values('ProjectLogo').filter(projectName=data['ProjectName']).first()[
-        'ProjectLogo']
-    projecthook = models.ProjectName.objects.values('ProjectHook').filter(projectName=data['ProjectName']).first()[
-        'ProjectHook']
+    print(data)
+    logo = models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()['projectLogo']
+    projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()['projectHook']
     api_url = "https://oapi.dingtalk.com/robot/send?access_token=" + projecthook
-    print(api_url)
+    print(logo)
     if type == 0:
         newdata = {
             "msgtype": "markdown",
             "markdown": {
                 "title": "项目发布",
-                "text": "### " + data['ProjectName'] + "更新概要\n" +
-                        "> #### 更新模块：\r\n" + data['ModifyModel'] + "\n\r" +
-                        "> #### 更新内容：\r\n " + data['ModifyContent'] + "\n\r" +
-                        "> #### 更新人员： \r\n" + data['Publisher'] + "\n\r" +
+                "text": "### " + data['projectName'] + "更新概要\n" +
+                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
+                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
+                        "> #### 更新人员： \r\n" + data['publisher'] + "\n\r" +
                         "![screenshot](" + logo + ")\n"
             },
             "at": {
@@ -142,11 +143,11 @@ def dingtalkmsg(data, type):
             "markdown": {
                 "title": "项目发布",
                 "text": "### " + data[
-                    'ProjectName'] + "更新成功 \n" +
+                    'projectName'] + "更新成功 \n" +
                         "![screenshot](https://moppowar.oss-accelerate.aliyuncs.com/projectlogo/ook.jpg)\n" +
-                        "> #### 更新模块：\r\n" + data['ModifyModel'] + "\n\r" +
-                        "> #### 更新内容：\r\n " + data['ModifyContent'] + "\n\r" +
-                        "> #### 更新人员： \r\n" + data['Publisher'] + "\n\r" +
+                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
+                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
+                        "> #### 更新人员： \r\n" + data['publisher'] + "\n\r" +
                         "![screenshot](" + logo + ")\n"
             },
             "at": {
@@ -160,11 +161,11 @@ def dingtalkmsg(data, type):
             "markdown": {
                 "title": "项目发布",
                 "text": "### " + data[
-                    'ProjectName'] + "更新失败 \n" +
+                    'projectName'] + "更新失败 \n" +
                         "![screenshot](https://moppowar.oss-accelerate.aliyuncs.com/projectlogo/fail.jpg)\n" +
-                        "> #### 更新模块：\r\n" + data['ModifyModel'] + "\n\r" +
-                        "> #### 更新内容：\r\n " + data['ModifyContent'] + "\n\r" +
-                        "> #### 更新人员： \r\n" + data['Publisher'] + "\n\r" +
+                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
+                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
+                        "> #### 更新人员： \r\n" + data['publisher'] + "\n\r" +
                         "![screenshot](" + logo + ")\n"
             },
             "at": {
@@ -180,7 +181,7 @@ def dingtalkmsg(data, type):
 
 ##计算发布时长函数
 def proTime(res):
-    start_time = models.DeployRecord.objects.values('DeployTime').filter(pk=res['id']).first()['DeployTime']
+    start_time = models.deployRecord.objects.values('deployTime').filter(pk=res['id']).first()['deployTime']
     ###数据库获取的值转换格式
     start_time = start_time.timestamp()
     stop_time = datetime.datetime.now().timestamp()
@@ -190,12 +191,12 @@ def proTime(res):
 
 
 
-## celery 定时任务
-from . import tasks
-def add(request,*args,**kwargs):
-  res = tasks.add.delay(1,2)
-  result = {'code': 0, 'msg': '这是一个后台任务'}
-  print(res)
-  return JsonResponse({'code':'successful','task_id':res.task_id})
-  # result = {'code': 0, 'msg': '这是一个后台任务'}
-  # return JsonResponse(result)
+# ## celery 定时任务
+# from . import tasks
+# def add(request,*args,**kwargs):
+#   res = tasks.add.delay(1,2)
+#   result = {'code': 0, 'msg': '这是一个后台任务'}
+#   print(res)
+#   return JsonResponse({'code':'successful','task_id':res.task_id})
+#   # result = {'code': 0, 'msg': '这是一个后台任务'}
+#   # return JsonResponse(result)

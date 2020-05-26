@@ -4,15 +4,14 @@ from django.forms.models import model_to_dict
 import hashlib
 import base64
 #
-res = model_to_dict(models.ossconf.objects.get(pk=1))
+res = model_to_dict(models.ossconf.objects.first())
 accessKey = res['accessKey']
 accessSecret = res['accessSecret']
 endPoint = res['endPoint']
-bucketname = res['bucketname']
+bucketName = res['bucketName']
 auth = oss2.Auth(accessKey, accessSecret)
-bucket = oss2.Bucket(auth, endPoint, bucketname)
+bucket = oss2.Bucket(auth, endPoint, bucketName)
 base_file_url = 'https://moppowar.oss-accelerate.aliyuncs.com/'
-
 
 def percentage(consumed_bytes, total_bytes):
     if total_bytes:
@@ -28,7 +27,12 @@ def update_fil_file(envtype,project,filename,file):
     :param file: 文件流
     :return:
     """
-    accessurl = 'ApkDir/' + envtype +'/' + project + '/' + filename
+    print(envtype,type(envtype))
+    if envtype == 1:
+        env = 'online'
+    elif envtype == 0:
+        env = 'offline'
+    accessurl = 'ApkDir/' + env +'/' + project + '/' + filename
     # 这个是阿里提供的SDK方法 bucket是调用的4.1中配置的变量名
 
     res = bucket.put_object(accessurl,file,progress_callback=percentage)

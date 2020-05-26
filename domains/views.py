@@ -11,10 +11,11 @@ from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import Descr
 #### 域名接口
 s = requests.session()
 
+
 def accountlist(request):
     limit = int(request.GET.get('limit', default='10'))
     page = int(request.GET.get('page', default='1'))
-    cid = request.GET.get('cid')
+    status = request.GET.get('status')
     remark = request.GET.get('remark')
     # print("cid is %s, remark is %s" % (cid, remark))
     if page == 1:
@@ -23,61 +24,44 @@ def accountlist(request):
     else:
         start = (page - 1) * limit
         stop = limit * page
+    kwargs = {
+        ##d
+    }
+    if status != None:
+        kwargs['status'] = status
 
-    if cid == None and remark == None:
-        count = models.Domainaccount.objects.count()
-        res = models.Domainaccount.objects.all()[start:stop]
-
-    if cid != None and remark != None:
-        res = models.Domainaccount.objects.filter(pk=cid, remark__contains=remark)
-        count = res.count()
+    if remark != None:
+        kwargs['remark'] = remark
+    if remark != None and status != None:
+        kwargs['remark'] = remark
+        kwargs['status'] = status
+    if remark == None and status == None:
+        res = models.Domainaccount.objects.all()[start:stop].values()
     else:
-        if remark != None:
-            res = models.Domainaccount.objects.filter(remark__contains=remark)
-            count = res.count()
-            cid = None
+        res = models.Domainaccount.objects.filter(**kwargs).values()
 
-        if cid != None:
-            res = models.Domainaccount.objects.filter(pk=cid)
-            count = 1
+    count = res.count()
 
     if len(res) > 0:
-        datalist = []
-        for i in range(len(res)):
-            initData = {"id": None, "register_website": None, "username": None, "password": None,
-                        "account_code": None,
-                        "status": None, "remark": None}
-            initData['id'] = res[i].id
-            initData['account_id'] = res[i].id
-            initData['register_website'] = res[i].register_website
-            initData['username'] = res[i].username
-            initData['password'] = res[i].password
-            initData['token_name'] = res[i].token_name
-            initData['token'] = res[i].token
-            initData['account_code'] = res[i].account_code
-            initData['status'] = res[i].status
-            initData['remark'] = res[i].remark
-            datalist.append(initData)
+        datalist = list(res)
 
-        settings.RESULT['code'] = 0
+
+        settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
-        data = json.dumps(settings.RESULT)
-        # print(data)
-        return HttpResponse(data)
+
     else:
         settings.RESULT['msg'] = "fail"
-    return HttpResponse("fail")
+    return JsonResponse(settings.RESULT)
 
 
 def domaininfo(request):
     limit = int(request.GET.get('limit', default='10'))
     page = int(request.GET.get('page', default='1'))
 
-    #TODO 这里project rootdomain 两个参数 可以带上 也可以不带上需要做判断
     project = request.GET.get('project')
-    rootdomain = request.GET.get('domain_name')
+    domain_name = request.GET.get('domain_name')
 
     if page == 1:
         start = 0
@@ -85,41 +69,32 @@ def domaininfo(request):
     else:
         start = (page - 1) * limit
         stop = limit * page
+    kwargs = {
+        ##d
+    }
+    if project != None:
+        kwargs['project'] = project
 
-    if project != None and rootdomain == '':
-        res = models.Domaininfo.objects.filter(project=project).all()
-        count = models.Domaininfo.objects.filter(project=project).count()
+    if domain_name != None:
+        kwargs['domain_name'] = domain_name
 
-    if rootdomain != None and project == '':
-        res = models.Domaininfo.objects.filter(domain_name=rootdomain).all()
-        count = models.Domaininfo.objects.filter(domain_name=rootdomain).count()
+    if domain_name != None and project != None:
+        kwargs['domain_name'] = domain_name
+        kwargs['project'] = project
 
-    if rootdomain == None and project == None:
-        res = models.Domaininfo.objects.all()[start:stop]
-        count = models.Domaininfo.objects.count()
+    if domain_name == None and project == None:
+        res = models.Domaininfo.objects.all().values()
+    else:
+        res = models.Domaininfo.objects.filter(**kwargs).values()
+
+    count = res.count()
 
     if len(res) > 0:
-        datalist = []
-        for i in range(len(res)):
-            initData = {"domainid": None, "project": None, "register_website": None, "name_account": None,
-                        "domain_name": None, "fqdn": None, "type": None, "answer": None, "remark": None}
-            initData['id'] = res[i].id
-            initData['project'] = res[i].project
-            initData['register_website'] = res[i].register_website
-            initData['name_account'] = res[i].name_account
-            initData['domain_name'] = res[i].domain_name
-            initData['fqdn'] = res[i].fqdn
-            initData['type'] = res[i].type
-            initData['answer'] = res[i].answer
-            initData['remark'] = res[i].remark
-            datalist.append(initData)
-
-        settings.RESULT['code'] = 0
+        datalist = list(res)
+        settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
-        # data = json.dumps(settings.RESULT)
-
         return JsonResponse(settings.RESULT)
     else:
         settings.RESULT['msg'] = "fail"
@@ -160,11 +135,11 @@ def domainsync(request):
                     data[i]['locked'] = False
                 domain_obj_list.append(
                     models.Domainlist(name_account=account,
-                               domainName=data[i]['domainName'],
-                               locked=data[i]['locked'],
-                               autorenewEnabled=data[i]['autorenewEnabled'],
-                               expireDate=data[i]['expireDate'].split('T')[0],
-                               createDate=data[i]['createDate'].split('T')[0])
+                                      domainName=data[i]['domainName'],
+                                      locked=data[i]['locked'],
+                                      autorenewEnabled=data[i]['autorenewEnabled'],
+                                      expireDate=data[i]['expireDate'].split('T')[0],
+                                      createDate=data[i]['createDate'].split('T')[0])
                 )
         else:
             result['msg'] = 'no domain'
@@ -196,12 +171,12 @@ def recordinfo(s, api_url, domian, username):
                 print(result['records'][i])
                 record_obj_list.append(
                     models.Domaininfo(name_account=username,
-                               register_website='www.name.com',
-                               domain_name=result['records'][i]['domainName'],
-                               fqdn=result['records'][i]['fqdn'],
-                               type=result['records'][i]['type'],
-                               answer=result['records'][i]['answer']
-                               )
+                                      register_website='www.name.com',
+                                      domain_name=result['records'][i]['domainName'],
+                                      fqdn=result['records'][i]['fqdn'],
+                                      type=result['records'][i]['type'],
+                                      answer=result['records'][i]['answer']
+                                      )
                 )
             models.Domaininfo.objects.filter(domain_name=result['records'][i]['domainName']).delete()
             models.Domaininfo.objects.bulk_create(record_obj_list)
@@ -227,6 +202,7 @@ def domainlist(request):
     """
     域名列表的接口
     """
+
     limit = int(request.GET.get('limit', default='10'))
     page = int(request.GET.get('page', default='1'))
     if page == 1:
@@ -236,25 +212,13 @@ def domainlist(request):
         start = (page - 1) * limit
         stop = limit * page
 
-    res = models.Domainlist.objects.all().order_by('expireDate')[start:stop]
+    res = models.Domainlist.objects.all().order_by('expireDate').values()[start:stop]
     count = models.Domainlist.objects.all().count()
 
     if len(res) > 0:
-        datalist = []
-        for i in range(len(res)):
-            initData = {"id": None, "name_account": None, "domainName": None, "locked": None,
-                        "autorenewEnabled": None, "expireDate": None, "createDate": None}
+        datalist = list(res)
 
-            initData['id'] = res[i].id
-            initData['name_account'] = res[i].name_account
-            initData['domainName'] = res[i].domainName
-            initData['locked'] = res[i].locked
-            initData['autorenewEnabled'] = res[i].autorenewEnabled
-            initData['expireDate'] = res[i].expireDate
-            initData['createDate'] = res[i].createDate
-            datalist.append(initData)
-
-        settings.RESULT['code'] = 0
+        settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
@@ -286,8 +250,8 @@ def modifyaccount(request):
         if is_ok == 1:
             front_respone['msg'] = 'success'
         else:
-            front_respone['code'] = 3001
-            front_respone['msg'] = 'failed'
+            front_respone['code'] = 2002
+            front_respone['msg'] = 'fail'
 
         return JsonResponse(front_respone)
 
@@ -353,4 +317,3 @@ def aliyunDomainRecord(domain, client, username):
         print(domaininfolist)
         models.Domaininfo.objects.filter(name_account=username, domain_name=records[i]['DomainName']).delete()
         models.Domaininfo.objects.bulk_create(domaininfolist)
-

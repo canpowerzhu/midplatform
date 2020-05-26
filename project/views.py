@@ -4,7 +4,7 @@ from project import models
 import json
 from midplatform import settings
 import datetime
-from project.models import  ProjectName
+from project.models import projectName
 from common import unpack
 
 from django.views.decorators.csrf import csrf_exempt
@@ -17,6 +17,8 @@ from django.views.decorators.csrf import csrf_exempt
 def getbaseinfo(request):
     limit = int(request.GET.get('limit', default='10'))
     page = int(request.GET.get('page', default='1'))
+    ProjectName = request.GET.get('ProjectName', default=None)
+
 
     if page == 1:
         start = 0
@@ -24,25 +26,26 @@ def getbaseinfo(request):
     else:
         start = (page - 1) * limit
         stop = limit * page
-
-    count = models.ProjectName.objects.count()
-    res = models.ProjectName.objects.all()[start:stop]
-
+    if  ProjectName != None:
+        res = models.projectName.objects.filter(projectName=projectName)
+    else:
+        res = models.projectName.objects.all().order_by('-id')[start:stop]
+    count = models.projectName.objects.count()
     if len(res) > 0:
         datalist = []
         for i in range(len(res)):
-            initData = {"id": None, "ProjectName": None, "ProjectHook": None, "ProjectModel": None, "ProjectLogo": None,
-                        "status": None, "UpdateTime": None}
+            initData = {"id": None, "projectName": None, "projectHook": None, "projectModel": None, "projectLogo": None,
+                        "status": None, "updateTime": None}
             initData['id'] = res[i].id
-            initData['ProjectName'] = res[i].projectName
-            initData['ProjectHook'] = res[i].ProjectHook
-            initData['ProjectModel'] = res[i].ProjectModel
-            initData['ProjectLogo'] = res[i].ProjectLogo
+            initData['projectName'] = res[i].projectName
+            initData['projectHook'] = res[i].projectHook
+            initData['projectModel'] = res[i].projectModel
+            initData['projectLogo'] = res[i].projectLogo
             initData['status'] = res[i].status
-            initData['UpdateTime'] = res[i].UpdateTime.strftime('%Y-%m-%d %H:%M:%S')
+            initData['updateTime'] = res[i].updateTime.strftime('%Y-%m-%d %H:%M:%S')
             datalist.append(initData)
         # print(datalist)
-        settings.RESULT['code'] = 0
+        settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
@@ -63,19 +66,13 @@ def modifybaseinfo(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
 
-        if 'status' in data:
-            statusnum = 1
-
-        else:
-            statusnum = 0
-
         front_respone = {'code': 2001, 'msg': None}
         try:
-            models.ProjectName.objects.filter(pk=data['id']).update(projectName=data['ProjectName'],
-                                                                    ProjectModel=data['ProjectModel'],
-                                                                    status=statusnum,
-                                                                    UpdateTime=datetime.datetime.now(),
-                                                                    ProjectLogo=data['ProjectLogo'])
+            models.projectName.objects.filter(pk=data['id']).update(projectName=data['projectName'],
+                                                                    projectModel=data['projectModel'],
+                                                                    status=data['status'],
+                                                                    updateTime=datetime.datetime.now(),
+                                                                    projectLogo=data['projectLogo'])
         except Exception as e:
 
             front_respone['msg'] = 'fail'
@@ -83,7 +80,8 @@ def modifybaseinfo(request):
             front_respone['msg'] = 'success'
         return JsonResponse(front_respone)
 
-#TODO 新增项目增加一个logo图片上传接口
+
+
 def addbaseinfo(request):
     """
     : func 新增项目
@@ -92,29 +90,35 @@ def addbaseinfo(request):
     """
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
-        if res['status'] == 'on':
-            statusinfo = 1
-        else:
-            statusinfo = 0
-
-        front_respone = {'code': 2001, 'msg': None}
+        # if res['status'] == 'on':
+        #     statusinfo = 1
+        # else:
+        #     statusinfo = 0
+        front_respone = {'code': None, 'msg': None}
         try:
-            models.ProjectName.objects.create(projectName=res['ProjectName'],
-                                              ProjectModel=res['ProjectModel'],
-                                              status=statusinfo,
-                                              ProjectLogo=res['ProjectLogo'])
+            models.projectName.objects.create(projectName=res['projectName'],
+                                              projectModel=res['projectModel'],
+                                              status=res['status'],
+                                              projectHook=res['projectHook'],
+                                              projectLogo=res['projectLogo'])
         except Exception as e:
             print(e)
-
+            front_respone['code'] = '2002'
             front_respone['msg'] = 'fail'
         else:
+            front_respone['code'] = '2001'
             front_respone['msg'] = 'success'
         return JsonResponse(front_respone)
 
 
+def addprojectlogo(request):
+    # TODO 新增项目增加一个logo图片上传接口
+    pass
+
+
 def getproname(request):
-    final_data = {"code": 2001, "msg": "success",  "data": None}
-    res = models.ProjectName.objects.values('projectName').all()
+    final_data = {"code": 2001, "msg": "success", "data": None}
+    res = models.projectName.objects.values('projectName').all()
     if len(res) > 0:
         data = {}
         for i in range(len(res)):
@@ -127,7 +131,7 @@ def getmodelname(request):
     final_data = {"code": 2001, "msg": "success", "data": None}
     proname = request.GET.get('proname')
     data = {}
-    res = models.ProjectName.objects.values('ProjectModel').filter(projectName=proname).first()['ProjectModel'].split(
+    res = models.projectName.objects.values('projectModel').filter(projectName=proname).first()['projectModel'].split(
         ',')
     for i in res:
         data[i] = i
@@ -137,11 +141,10 @@ def getmodelname(request):
 
 ###项目login相关view
 def urlinfo(request):
-
     limit = int(request.GET.get('limit', default='10'))
     page = int(request.GET.get('page', default='1'))
     project = request.GET.get('project', default=None)
-    #TODO 这里的project_type 不要使用汉字描述，采取其他标记 可以设计一个表
+    # TODO 这里的project_type 不要使用汉字描述，采取其他标记 可以设计一个表
     project_type = request.GET.get('project_type', default=None)
 
     if page == 1:
@@ -151,21 +154,22 @@ def urlinfo(request):
         start = (page - 1) * limit
         stop = limit * page
 
-    if project_type != None and project == '':
-        res = models.projectinfo.objects.filter(project_type=project_type)
-        count = res.count()
+    kwargs = {}
+    if project_type != None:
+        kwargs['project_type'] = project_type
 
-    if project != None and project_type == '':
-        res = models.projectinfo.objects.filter(project=project)
-        count = res.count()
+    if project != None:
+        kwargs['project'] = project
 
-    if project != '' and project_type != '':
-        res = models.projectinfo.objects.filter(project_type=project_type, project=project)
-        count = res.count()
+    if project != None and project_type != None:
+        kwargs['project'] = project
+        kwargs['project_type'] = project_type
 
+    res = models.projectinfo.objects.filter(**kwargs).order_by('-id')
+    count = res.count()
     if project == None and project_type == None:
         count = models.projectinfo.objects.count()
-        res = models.projectinfo.objects.all()[start:stop]
+        res = models.projectinfo.objects.all().order_by('-id')[start:stop]
 
     if len(res) > 0:
         datalist = []
@@ -184,7 +188,7 @@ def urlinfo(request):
             initData['remarks'] = res[i].remarks
             datalist.append(initData)
 
-        settings.RESULT['code'] = 0
+        settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
@@ -197,7 +201,7 @@ def urlinfo(request):
 
 
 def urlinfoselect(request):
-    final_data ={"code":2001,"data":None}
+    final_data = {"code": 2001, "data": None}
     data = {'project': [], 'project_type': []}
     project_res = models.projectinfo.objects.values('project').distinct()
     for item in project_res:
@@ -206,7 +210,7 @@ def urlinfoselect(request):
     project_type_res = models.projectinfo.objects.values('project_type').distinct()
     for item in project_type_res:
         data['project_type'].append(item['project_type'])
-    final_data['data']= data
+    final_data['data'] = data
     return JsonResponse(final_data)
 
 
@@ -222,7 +226,6 @@ def addurlinfo(request):
         return JsonResponse(front_respone)
 
 
-
 def editlogin(request):
     front_respone = {'code': 2001, 'msg': None}
     if request.method == 'POST':
@@ -233,12 +236,5 @@ def editlogin(request):
             state = 0
 
         models.projectinfo.objects.filter(pk=res['id']).update(gologin=state)
-        # models.projectinfo.objects.create(project=res['project'],
-        #                                   project_type=res['project_type'],
-        #                                   website_url=res['website_url'],
-        #                                   gologin=res['gologin'])
         front_respone['msg'] = 'success'
         return JsonResponse(front_respone)
-
-
-

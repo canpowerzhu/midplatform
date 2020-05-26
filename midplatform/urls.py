@@ -1,7 +1,9 @@
 
 from django.conf.urls import url, include
 from django.contrib import admin
-from .views import  login,home
+
+
+
 
 
 urlpatterns = [
@@ -13,4 +15,5 @@ urlpatterns = [
     url(r'^sysconf/', include("sysconf.urls")),
     url(r'^project/', include("project.urls")),
     url(r'^mophealth/', include("mophealth.urls")),
+
 ]

@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.db.backends.mysql.base import DatabaseWrapper
+DatabaseWrapper.data_types = DatabaseWrapper._data_types
 ### 域名相关
 class Domainaccount(models.Model):
     register_website = models.CharField(max_length=50, verbose_name="域名注册服务商")
