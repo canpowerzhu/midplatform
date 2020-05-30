@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7b022e7d-0758-4bb2-9231-9594f282b774" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/sysconf/migrations/0002_auto_20200530_1932.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sysconf/migrations/0003_auto_20200530_2023.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sysconf/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sysconf/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sysconf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/ossupload.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/ossupload.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -131,7 +127,7 @@
       <workItem from="1590490981555" duration="17562000" />
       <workItem from="1590720542031" duration="9772000" />
       <workItem from="1590822949192" duration="314000" />
-      <workItem from="1590823462289" duration="11605000" />
+      <workItem from="1590823462289" duration="12963000" />
     </task>
     <servers />
   </component>

@@ -6,6 +6,7 @@ from common import midplatformcrypt
 import  json
 from django.core.paginator import Paginator
 from django.db.models import Q
+from common import ossupload
 
 
 ##路由配置
@@ -147,7 +148,7 @@ def sysuser(request):
             kwargs['phone'] = phone
 
 
-        sysUser = models.sys_user.objects.filter(type__gte=sysUserType).filter(**kwargs).order_by('-createTime').values('id','username','nickname','password','salt','avatar','gender','email','phone','status','type','deleted','createTime','updateTime')
+        sysUser = models.sys_user.objects.filter(type__gte=sysUserType,deleted=0).filter(**kwargs).order_by('-createTime').values('id','username','nickname','password','salt','avatar','gender','email','phone','status','type','deleted','createTime','updateTime')
         paginator = Paginator(sysUser, limit)
         # 获取第2页的数据
         pageData = paginator.page(page)
@@ -165,20 +166,36 @@ def sysuser(request):
     elif request.method == 'DELETE' or request.method == 'delete':
 
         res = int(request.GET.get('id'))
-        models.sys_user.objects.filter(pk=res['id']).delete()
+        models.sys_user.objects.filter(pk=res['id']).update(deleted=1)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
 
 
     elif request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
+        if res['avatar'] != None:
+            avatarPath=ossupload.uploadBase64Pic(res['avatar'])
+            if avatarPath != None:
+                res['avatar'] =avatarPath
+            else:
+                settings.RESULT['code'] = 2002
+                settings.RESULT['msg'] = 'fail'
+                return JsonResponse(settings.RESULT)
         models.sys_user.objects.filter(pk=res['id']).update(**res)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
 
     elif request.method == 'POST' or request.method == 'post':
-        router_dict = json.loads(request.body.decode('utf-8'))
-        models.sys_user.objects.create(**router_dict)
+        sysUserDict = json.loads(request.body.decode('utf-8'))
+        if sysUserDict['avatar'] != None:
+            avatarPath=ossupload.uploadBase64Pic(sysUserDict['avatar'])
+            if avatarPath != None:
+                sysUserDict['avatar'] =avatarPath
+            else:
+                settings.RESULT['code'] = 2002
+                settings.RESULT['msg'] = 'fail'
+                return JsonResponse(settings.RESULT)
+        models.sys_user.objects.create(**sysUserDict)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
     return JsonResponse(settings.RESULT)

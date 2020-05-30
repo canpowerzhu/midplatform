@@ -32,7 +32,7 @@ def update_fil_file(envtype,project,filename,file):
         env = 'online'
     elif envtype == 0:
         env = 'offline'
-    accessurl = 'ApkDir/' + env +'/' + project + '/' + filename
+    accessurl = 'midplatform/ApkDir/' + env +'/' + project + '/' + filename
     # 这个是阿里提供的SDK方法 bucket是调用的4.1中配置的变量名
 
     res = bucket.put_object(accessurl,file,progress_callback=percentage)
@@ -44,14 +44,24 @@ def update_fil_file(envtype,project,filename,file):
 
 
 
-def uploadBase64Pic(projectname,data):
+def uploadBase64Pic(projectname,data,avatar):
     b64_data = data.split(';base64,')[1]
     logoType = data.split(';base64,')[0].split('/')[1]
     data = base64.b64decode(b64_data)
-    remotePath='projectlogo/' + projectname + '.' + logoType
+    if projectname != None:
+        remotePath='midplatform/projectlogo/' + projectname + '.' + logoType
+    elif avatar != None:
+        import calendar
+        import time
+        ts = calendar.timegm(time.gmtime())
+        remotePath = 'midplatform/avatar/' + ts + '.' + logoType
+    else:
+        return False
     res = bucket.put_object(remotePath, data)
     if not res.status == 200:
         return False
     return remotePath
+
+
 
 
