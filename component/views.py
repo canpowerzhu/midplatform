@@ -7,27 +7,31 @@ from midplatform import settings
 from django.http import JsonResponse
 from component import models
 from common import unpack
+from django.core.paginator import Paginator
 ### 获取现有的apk上传列表
 def getapklist(request):
-    limit = int(request.GET.get('limit', default='10'))
-    page = int(request.GET.get('page', default='1'))
+    limit = int(request.GET.get('limit', default=10))
+    page = int(request.GET.get('page', default=1))
     envType = request.GET.get('envType')
-    if page == 1:
-        start = 0
-        stop = limit
-    else:
-        start = (page - 1) * limit
-        stop = limit * page
+    # if page == 1:
+    #     start = 0
+    #     stop = limit
+    # else:
+    #     start = (page - 1) * limit
+    #     stop = limit * page
 
     if envType != None :
         res = models.apklist.objects.filter(envType=envType).values()
         count = res.count()
     else:
         count = models.apklist.objects.count()
-        res = models.apklist.objects.all().values()[start:stop]
-
+        res = models.apklist.objects.all().values()
+        # 每页显示10条记录
+    paginator = Paginator(res, limit)
+    # 获取第2页的数据
+    pageData = paginator.page(page)
     if len(res) > 0:
-        datalist = list(res)
+        datalist = list(pageData)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count

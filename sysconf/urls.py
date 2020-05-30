@@ -9,8 +9,9 @@ urlpatterns = [
     url(r'^ossconf/', views.ossconf),
     url(r'^modifyossconf/', views.modifyossconf),
     url(r'^mailserver/', views.mailserver),
-    url(r'^addrouter/', views.addrouter),
-    url(r'^editrouter/', views.editrouter),
+    url(r'^getrouter/', views.getrouter),
+    # url(r'^editrouter/', views.editrouter),
+    # url(r'^deleterouter/', views.deleterouter),
     # url(r'^listrouter/', views.listrouter),
 ]
 

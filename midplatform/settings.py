@@ -191,3 +191,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
 # CELERY_ACCEPT_CONTENT = ['application/json', ]
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_SERIALIZER = 'json'
+
+
+ossDomain='https://moppowar.oss-accelerate.aliyuncs.com'

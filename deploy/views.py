@@ -5,7 +5,7 @@ from deploy import models
 from django.conf import settings
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
-
+from django.core.paginator import Paginator
 
 import datetime
 
@@ -17,15 +17,15 @@ import datetime
 #
 #
 def getallrecord(request):
-    limit = int(request.GET.get('limit', default='10'))
-    page = int(request.GET.get('page', default='1'))
+    limit = int(request.GET.get('limit', default=10))
+    page = int(request.GET.get('page', default=1))
 
-    if page == 1:
-        start = 0
-        stop = limit
-    else:
-        start = (page - 1) * limit
-        stop = limit * page
+    # if page == 1:
+    #     start = 0
+    #     stop = limit
+    # else:
+    #     start = (page - 1) * limit
+    #     stop = limit * page
 
     projectName = request.GET.get('projectName')
     publisher = request.GET.get('publisher')
@@ -44,18 +44,22 @@ def getallrecord(request):
         kwargs['Publisher'] = publisher
     else:
         count = models.deployRecord.objects.filter(**kwargs).count()
-        res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime')[start:stop].values()
+        res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime').values()
 
     count = models.deployRecord.objects.filter(**kwargs).count()
-    res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime')[start:stop].values()
+    res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime').values()
 
-    datalist = list(res)
+    # 每页显示10条记录
+    paginator = Paginator(res, limit)
+    # 获取第2页的数据
+    pageData = paginator.page(page)
+    datalist = list(pageData)
     if count > 0:
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
-        print(datalist)
+        # print(datalist)
     else:
         # del settings.RESULT['count']
         # del settings.RESULT['data']
@@ -67,14 +71,17 @@ def getallrecord(request):
 def addrecord(request):
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
+        print(res)
+        #TODO 没有缓存上传为0 需要判断
+        #{'isModifyCache': 0, 'isModifySql': 0, 'projectName': '21212121', 'state': 0, 'isRollBack': 1, 'publisher': 'dixiaoping', 'modifyContent': '11212211221', 'modifyModel': '21233232122112'}
         kwargs ={
             ##动态参数
         }
-        if 'isModifyCache' in res.keys():
+        if res['isModifyCache'] == 1:
             kwargs['isModifyCache'] = 1
             kwargs['cacheDetail'] = res['cacheDetail']
 
-        if 'isModifySql' in res.keys():
+        if res['isModifySql'] == 1:
             kwargs['isModifySql'] = 1
             kwargs['sqlDetail'] = res['sqlDetail']
 

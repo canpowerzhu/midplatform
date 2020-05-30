@@ -7,23 +7,17 @@ import requests, request
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
-
+from django.core.paginator import Paginator
 #### 域名接口
 s = requests.session()
 
 
 def accountlist(request):
-    limit = int(request.GET.get('limit', default='10'))
-    page = int(request.GET.get('page', default='1'))
+    limit = int(request.GET.get('limit', default=10))
+    page = int(request.GET.get('page', default=1))
     status = request.GET.get('status')
     remark = request.GET.get('remark')
-    # print("cid is %s, remark is %s" % (cid, remark))
-    if page == 1:
-        start = 0
-        stop = limit
-    else:
-        start = (page - 1) * limit
-        stop = limit * page
+
     kwargs = {
         ##d
     }
@@ -36,14 +30,17 @@ def accountlist(request):
         kwargs['remark'] = remark
         kwargs['status'] = status
     if remark == None and status == None:
-        res = models.Domainaccount.objects.all()[start:stop].values()
+        res = models.Domainaccount.objects.all().values()
     else:
         res = models.Domainaccount.objects.filter(**kwargs).values()
 
     count = res.count()
-
-    if len(res) > 0:
-        datalist = list(res)
+    # 每页显示10条记录
+    paginator = Paginator(res, limit)
+    # 获取第2页的数据
+    pageData = paginator.page(page)
+    if len(pageData) > 0:
+        datalist = list(pageData)
 
 
         settings.RESULT['code'] = 2001
@@ -57,18 +54,12 @@ def accountlist(request):
 
 
 def domaininfo(request):
-    limit = int(request.GET.get('limit', default='10'))
-    page = int(request.GET.get('page', default='1'))
+    limit = int(request.GET.get('limit', default=10))
+    page = int(request.GET.get('page', default=1))
 
     project = request.GET.get('project')
     domain_name = request.GET.get('domain_name')
 
-    if page == 1:
-        start = 0
-        stop = limit
-    else:
-        start = (page - 1) * limit
-        stop = limit * page
     kwargs = {
         ##d
     }
@@ -88,9 +79,12 @@ def domaininfo(request):
         res = models.Domaininfo.objects.filter(**kwargs).values()
 
     count = res.count()
-
-    if len(res) > 0:
-        datalist = list(res)
+    # 每页显示10条记录
+    paginator = Paginator(res, limit)
+    # 获取第2页的数据
+    pageData = paginator.page(page)
+    if len(pageData) > 0:
+        datalist = list(pageData)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
@@ -203,20 +197,17 @@ def domainlist(request):
     域名列表的接口
     """
 
-    limit = int(request.GET.get('limit', default='10'))
-    page = int(request.GET.get('page', default='1'))
-    if page == 1:
-        start = 0
-        stop = limit
-    else:
-        start = (page - 1) * limit
-        stop = limit * page
+    limit = int(request.GET.get('limit', default=10))
+    page = int(request.GET.get('page', default=1))
 
-    res = models.Domainlist.objects.all().order_by('expireDate').values()[start:stop]
+    res = models.Domainlist.objects.all().order_by('expireDate').values()
     count = models.Domainlist.objects.all().count()
-
-    if len(res) > 0:
-        datalist = list(res)
+    # 每页显示10条记录
+    paginator = Paginator(res, limit)
+    # 获取第page页的数据
+    pageData = paginator.page(page)
+    if len(pageData) > 0:
+        datalist = list(pageData)
 
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'

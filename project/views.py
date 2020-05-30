@@ -5,7 +5,10 @@ import json
 from midplatform import settings
 import datetime
 from project.models import projectName
+from common import ossupload
+from django.core.paginator import Paginator
 from common import unpack
+import os
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -15,46 +18,30 @@ from django.views.decorators.csrf import csrf_exempt
 ##项目管理
 # 项目基础信息包含四个接口： getbaseinfo、modifybaseinfo、addbaseinfo
 def getbaseinfo(request):
-    limit = int(request.GET.get('limit', default='10'))
-    page = int(request.GET.get('page', default='1'))
+    limit = int(request.GET.get('limit', default=10))
+    page = int(request.GET.get('page', default=1))
     ProjectName = request.GET.get('ProjectName', default=None)
 
-
-    if page == 1:
-        start = 0
-        stop = limit
-    else:
-        start = (page - 1) * limit
-        stop = limit * page
     if  ProjectName != None:
-        res = models.projectName.objects.filter(projectName=projectName)
+        res = models.projectName.objects.filter(projectName=projectName).values()
     else:
-        res = models.projectName.objects.all().order_by('-id')[start:stop]
+        res = models.projectName.objects.all().values().order_by('-id')
     count = models.projectName.objects.count()
-    if len(res) > 0:
-        datalist = []
-        for i in range(len(res)):
-            initData = {"id": None, "projectName": None, "projectHook": None, "projectModel": None, "projectLogo": None,
-                        "status": None, "updateTime": None}
-            initData['id'] = res[i].id
-            initData['projectName'] = res[i].projectName
-            initData['projectHook'] = res[i].projectHook
-            initData['projectModel'] = res[i].projectModel
-            initData['projectLogo'] = res[i].projectLogo
-            initData['status'] = res[i].status
-            initData['updateTime'] = res[i].updateTime.strftime('%Y-%m-%d %H:%M:%S')
-            datalist.append(initData)
-        # print(datalist)
+
+    # 每页显示10条记录
+    paginator = Paginator(res, limit)
+    # 获取第2页的数据
+    pageData = paginator.page(page)
+    if len(pageData) > 0:
+        datalist = list(pageData)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
-        data = json.dumps(settings.RESULT)
-        return HttpResponse(data)
     else:
+        settings.RESULT['code'] = 2002
         settings.RESULT['msg'] = "fail"
-        print(settings.RESULT)
-    return HttpResponse("fail")
+    return JsonResponse(settings.RESULT)
 
 
 def modifybaseinfo(request):
@@ -90,30 +77,28 @@ def addbaseinfo(request):
     """
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
-        # if res['status'] == 'on':
-        #     statusinfo = 1
-        # else:
-        #     statusinfo = 0
+
+
+        uploadPic = ossupload.uploadBase64Pic(res['projectName'],res['projectLogo'])
         front_respone = {'code': None, 'msg': None}
         try:
+            # pass
             models.projectName.objects.create(projectName=res['projectName'],
                                               projectModel=res['projectModel'],
                                               status=res['status'],
                                               projectHook=res['projectHook'],
-                                              projectLogo=res['projectLogo'])
+                                              projectLogo=uploadPic)
         except Exception as e:
             print(e)
-            front_respone['code'] = '2002'
+            front_respone['code'] = 2002
             front_respone['msg'] = 'fail'
         else:
-            front_respone['code'] = '2001'
+            front_respone['code'] = 2001
             front_respone['msg'] = 'success'
         return JsonResponse(front_respone)
 
 
-def addprojectlogo(request):
-    # TODO 新增项目增加一个logo图片上传接口
-    pass
+
 
 
 def getproname(request):
@@ -141,18 +126,18 @@ def getmodelname(request):
 
 ###项目login相关view
 def urlinfo(request):
-    limit = int(request.GET.get('limit', default='10'))
-    page = int(request.GET.get('page', default='1'))
+    limit = int(request.GET.get('limit', default=10))
+    page = int(request.GET.get('page', default=1))
     project = request.GET.get('project', default=None)
     # TODO 这里的project_type 不要使用汉字描述，采取其他标记 可以设计一个表
     project_type = request.GET.get('project_type', default=None)
 
-    if page == 1:
-        start = 0
-        stop = limit
-    else:
-        start = (page - 1) * limit
-        stop = limit * page
+    # if page == 1:
+    #     start = 0
+    #     stop = limit
+    # else:
+    #     start = (page - 1) * limit
+    #     stop = limit * page
 
     kwargs = {}
     if project_type != None:
@@ -169,11 +154,15 @@ def urlinfo(request):
     count = res.count()
     if project == None and project_type == None:
         count = models.projectinfo.objects.count()
-        res = models.projectinfo.objects.all().order_by('-id')[start:stop]
+        res = models.projectinfo.objects.all().order_by('-id')
 
-    if len(res) > 0:
+    # 每页显示10条记录
+    paginator = Paginator(res, limit)
+    # 获取第2页的数据
+    pageData = paginator.page(page)
+    if len(pageData) > 0:
         datalist = []
-        for i in range(len(res)):
+        for i in range(len(pageData)):
             if res[i].gologin:
                 status = 1
             else:

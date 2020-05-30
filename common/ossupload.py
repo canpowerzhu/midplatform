@@ -41,3 +41,17 @@ def update_fil_file(envtype,project,filename,file):
     else:
         print('fail')
         return False
+
+
+
+def uploadBase64Pic(projectname,data):
+    b64_data = data.split(';base64,')[1]
+    logoType = data.split(';base64,')[0].split('/')[1]
+    data = base64.b64decode(b64_data)
+    remotePath='projectlogo/' + projectname + '.' + logoType
+    res = bucket.put_object(remotePath, data)
+    if not res.status == 200:
+        return False
+    return remotePath
+
+

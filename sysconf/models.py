@@ -26,7 +26,7 @@ class sys_menu(models.Model):
     )
 
     title = models.CharField(max_length=300, verbose_name='菜单标题')
-    perssion = models.CharField(null=True,max_length=300, verbose_name='菜单权限标识')
+    code = models.CharField(null=True,max_length=300, verbose_name='菜单权限标识')
     path = models.CharField(max_length=300, verbose_name='路由URL')
     routerName = models.CharField(max_length=300, verbose_name='路由名称')
     component = models.CharField(null=True,max_length=300, verbose_name='component地址')
@@ -35,12 +35,12 @@ class sys_menu(models.Model):
     parentId = models.IntegerField(verbose_name='父级菜单ID')
     icon = models.CharField(null=True,max_length=120, verbose_name='图标')
     sort = models.IntegerField(null=True, verbose_name='排序值，用于菜单排序')
-    keep_alive = models.IntegerField(default=1,choices=keep_alive_choice,verbose_name='0-关闭，1- 开启')
+    KeepAlive = models.IntegerField(default=1,choices=keep_alive_choice,verbose_name='0-关闭，1- 开启')
     type = models.IntegerField(default=0,choices=type_choice,verbose_name='菜单类型 （0-菜单 1-按钮')
     hidden = models.IntegerField(default=0,choices=hidden_choice,verbose_name='是否隐藏路由: 0-否,1-是')
-    del_flag = models.IntegerField(default=1,choices=del_flag_choice,verbose_name='逻辑删除 0-删除， 1-正常')
-    create_time = models.DateTimeField(auto_now=True, verbose_name='创建时间')
-    update_time = models.DateTimeField(auto_now=True,verbose_name='更新时间')
+    deleted = models.IntegerField(default=1,choices=del_flag_choice,verbose_name='逻辑删除 0-删除， 1-正常')
+    createTime = models.DateTimeField(auto_now=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(auto_now=True,verbose_name='更新时间')
 
 class sys_user_role(models.Model):
     """
