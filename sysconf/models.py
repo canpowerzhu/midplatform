@@ -36,7 +36,7 @@ class sys_menu(models.Model):
     icon = models.CharField(null=True,max_length=120, verbose_name='图标')
     sort = models.IntegerField(null=True, verbose_name='排序值，用于菜单排序')
     KeepAlive = models.IntegerField(default=1,choices=keep_alive_choice,verbose_name='0-关闭，1- 开启')
-    type = models.IntegerField(default=0,choices=type_choice,verbose_name='菜单类型 （0-菜单 1-按钮')
+    type = models.IntegerField(default=0,choices=type_choice,verbose_name='菜单类型 （0-目录 1-菜单 2-按钮')
     hidden = models.IntegerField(default=0,choices=hidden_choice,verbose_name='是否隐藏路由: 0-否,1-是')
     deleted = models.IntegerField(default=1,choices=del_flag_choice,verbose_name='逻辑删除 0-删除， 1-正常')
     createTime = models.DateTimeField(auto_now=True, verbose_name='创建时间')
@@ -71,15 +71,16 @@ class sys_user(models.Model):
     username = models.CharField(unique=True,null=True,max_length=100, verbose_name='用户名')
     nickname = models.CharField(null=True,max_length=100, verbose_name='显示名称')
     password = fields.EncryptedCharField(null=True,max_length=100, verbose_name='显示名称')
+    type = models.IntegerField(verbose_name='0-超级管理员，1-管理员，2-项目管理员，3-开发人员，4-测试人员，5-访客')
     salt = models.CharField(null=True,max_length=100, verbose_name='MD5密码盐')
     avatar = models.CharField(null=True,max_length=100, verbose_name='头像')
     gender = models.IntegerField(choices=GENDER_CHOICES, verbose_name='性别')
     email = models.CharField(null=True,max_length=100, verbose_name='电子邮箱')
     phone = models.CharField(null=True,max_length=100, verbose_name='电话')
     status = models.IntegerField(db_index=True, choices=LOCK_CHOICES, verbose_name='用户状态，锁定 正常')
-    del_flag = models.IntegerField(db_index=True,choices=DEL_CHOICES, verbose_name='删除状态，锁定 正常')
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
-    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    deleted = models.IntegerField(db_index=True,choices=DEL_CHOICES, verbose_name='删除状态，锁定 正常')
+    createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 
 class sys_role(models.Model):
     """

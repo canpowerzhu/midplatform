@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^modifyossconf/', views.modifyossconf),
     url(r'^mailserver/', views.mailserver),
     url(r'^getrouter/', views.getrouter),
-    # url(r'^editrouter/', views.editrouter),
+    url(r'^sysuser/', views.sysuser),
     # url(r'^deleterouter/', views.deleterouter),
     # url(r'^listrouter/', views.listrouter),
 ]

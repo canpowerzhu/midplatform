@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7b022e7d-0758-4bb2-9231-9594f282b774" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/sysconf/migrations/0002_auto_20200530_1932.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sysconf/migrations/0003_auto_20200530_2023.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/ossupload.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/ossupload.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/component/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/component/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domains/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/domains/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/midplatform/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/midplatform/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/project/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sysconf/migrations/0002_auto_20200526_1610.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/views.py" afterDir="false" />
@@ -134,7 +129,9 @@
       <workItem from="1590490100054" duration="304000" />
       <workItem from="1590490936908" duration="20000" />
       <workItem from="1590490981555" duration="17562000" />
-      <workItem from="1590720542031" duration="8111000" />
+      <workItem from="1590720542031" duration="9772000" />
+      <workItem from="1590822949192" duration="314000" />
+      <workItem from="1590823462289" duration="11605000" />
     </task>
     <servers />
   </component>
@@ -154,26 +151,26 @@
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state x="580" y="185" key="FileChooserDialogImpl/0.0.1600.860@0.0.1600.860" timestamp="1588053786228" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom" timestamp="1590818838160">
+    <state width="1876" height="111" key="GridCell.Tab.0.bottom" timestamp="1590842090255">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.bottom/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1877" height="261" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590818838160" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center" timestamp="1590818838160">
+    <state width="1876" height="111" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590842090255" />
+    <state width="1876" height="111" key="GridCell.Tab.0.center" timestamp="1590842090255">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.center/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1877" height="261" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590818838160" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left" timestamp="1590818838160">
+    <state width="1876" height="111" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590842090255" />
+    <state width="1876" height="111" key="GridCell.Tab.0.left" timestamp="1590842090255">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.left/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1877" height="261" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590818838160" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right" timestamp="1590818838160">
+    <state width="1876" height="111" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590842090255" />
+    <state width="1876" height="111" key="GridCell.Tab.0.right" timestamp="1590842090255">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.right/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1877" height="261" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590818838160" />
+    <state width="1876" height="111" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590842090255" />
     <state width="1877" height="297" key="GridCell.Tab.1.bottom" timestamp="1590491556006">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
