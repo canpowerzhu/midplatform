@@ -44,19 +44,21 @@ def update_fil_file(envtype,project,filename,file):
 
 
 
-def uploadBase64Pic(projectname,data,avatar):
+def uploadBase64Pic(data,projectname=''):
     b64_data = data.split(';base64,')[1]
     logoType = data.split(';base64,')[0].split('/')[1]
     data = base64.b64decode(b64_data)
-    if projectname != None:
+    if projectname :
+        print('项目logo')
         remotePath='midplatform/projectlogo/' + projectname + '.' + logoType
-    elif avatar != None:
+    else:
+        print('用户头像')
         import calendar
         import time
-        ts = calendar.timegm(time.gmtime())
+        ts = str(calendar.timegm(time.gmtime()))
         remotePath = 'midplatform/avatar/' + ts + '.' + logoType
-    else:
-        return False
+
+
     res = bucket.put_object(remotePath, data)
     if not res.status == 200:
         return False
