@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^mailserver/', views.mailserver),
     url(r'^getrouter/', views.getrouter),
     url(r'^sysuser/', views.sysuser),
+    url(r'^sysuser/', views.sysuser),
     # url(r'^deleterouter/', views.deleterouter),
     # url(r'^listrouter/', views.listrouter),
 ]

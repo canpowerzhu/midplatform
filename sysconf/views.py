@@ -17,7 +17,7 @@ def getrouter(request):
     :return:
     """
     if request.method == 'GET' or request.method == 'get':
-        router = models.sys_menu.objects.all().filter(~Q(type=2)).values('component','hidden','icon','sort','id','KeepAlive','parentId','path','redirect','routerName','target','title','type','code')
+        router = models.sys_menu.objects.filter(deleted=0).filter(~Q(type=2)).values('component','hidden','icon','sort','id','KeepAlive','parentId','path','redirect','routerName','target','title','type','code')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -31,7 +31,7 @@ def router(request):
     :return:
     """
     if request.method == 'GET' or request.method == 'get':
-        router = models.sys_menu.objects.all().values('component','hidden','icon','sort','id','KeepAlive','parentId','path','redirect','routerName','target','title','type','code')
+        router = models.sys_menu.objects.filter(deleted=0).values('component','hidden','icon','sort','id','KeepAlive','parentId','path','redirect','routerName','target','title','type','code')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -41,7 +41,7 @@ def router(request):
     elif request.method == 'DELETE' or request.method == 'delete':
 
         res = int(request.GET.get('id'))
-        models.sys_menu.objects.filter(pk=res['id']).delete()
+        models.sys_menu.objects.filter(pk=res['id']).update(deleted=1)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         # return JsonResponse(settings.RESULT)
@@ -112,7 +112,7 @@ def Aescrypt(reqsecret):
 
     back_data = {}
     ###这里初始化加密对象 传入key 初始化密钥, 以及对应的偏移量
-    text = midplatformcrypt.midowncrppt('i am wonderful!!', 'i am a offset wq')
+    text = midplatformcrypt.midowncrppt('===bWlkcGxhdGZvcm0gYXV0aA=====', '==bWlkcGxhdGZvcm0gb2Zmc2V0==')
     e = text.encrypt(reqsecret)
     jie_mi = text.decrypt(e)
     back_data['jiami'] = e.decode('utf-8')
@@ -160,7 +160,7 @@ def sysuser(request):
             settings.RESULT['count'] = sysUser.count()
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'success'
-            settings.RESULT['data'] = {'records': records,'orders':[{'column':'createTime'}]}
+            settings.RESULT['data'] = records
 
 
     elif request.method == 'DELETE' or request.method == 'delete':
@@ -173,14 +173,15 @@ def sysuser(request):
 
     elif request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
-        if res['avatar'] != None:
-            avatarPath=ossupload.uploadBase64Pic(res['avatar'])
-            if avatarPath != None:
-                res['avatar'] =avatarPath
-            else:
-                settings.RESULT['code'] = 2002
-                settings.RESULT['msg'] = 'fail'
-                return JsonResponse(settings.RESULT)
+        if 'avatar' in res.keys():
+            if res['avatar'].split('/')[0] != 'midplatform':
+                avatarPath=ossupload.uploadBase64Pic(res['avatar'])
+                if avatarPath != None:
+                    res['avatar'] =avatarPath
+                else:
+                    settings.RESULT['code'] = 2002
+                    settings.RESULT['msg'] = 'fail'
+                    return JsonResponse(settings.RESULT)
         models.sys_user.objects.filter(pk=res['id']).update(**res)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
