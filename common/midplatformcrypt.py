@@ -15,12 +15,12 @@ class midowncrppt(object):
         self.iv = iv.encode('utf-8')
 
 
-    def add_to_32(self, msg):
+    def add_to_16(self, msg):
         # 这里密钥key 长度必须为16（AES-128）,
         # 24（AES-192）,或者32 （AES-256）Bytes 长度
         # 目前AES-128 足够目前使用
-        if len(msg.encode('utf-8')) % 32:
-            add = 32 - len(msg.encode('utf-8'))
+        if len(msg.encode('utf-8')) % 16:
+            add = 16 - len(msg.encode('utf-8'))
         else:
             add = 0
 
@@ -28,7 +28,8 @@ class midowncrppt(object):
         return msg.encode('utf-8')
 
     def encrypt(self, msg):
-        msg = self.add_to_32(msg)
+
+        msg = self.add_to_16(msg)
         cryptos = AES.new(self.key, self.mode, self.iv)
         self.cipher_text = cryptos.encrypt(msg)
         return b2a_hex(self.cipher_text)

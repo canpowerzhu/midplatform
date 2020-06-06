@@ -12,7 +12,13 @@ urlpatterns = [
     url(r'^getrouter/', views.getrouter),
     url(r'^sysuser/', views.sysuser),
     url(r'^sysuser/', views.sysuser),
-    # url(r'^deleterouter/', views.deleterouter),
-    # url(r'^listrouter/', views.listrouter),
+    url(r'^test/', views.test),
+    url(r'^setPassword/', views.setPassword),
+    url(r'^sysRole/', views.sysRole),
+    url(r'^sysRoleSelect/', views.sysRoleSelect),
+    url(r'^sysRoleMenuSelect/', views.sysRoleMenuSelect),
+    url(r'^setPassword/', views.setPassword),
+    url(r'^sysusergrant/', views.sysusergrant),
+    url(r'^sysuserlogin/', views.sysuserlogin),
 ]
 

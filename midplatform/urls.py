@@ -7,7 +7,7 @@ from django.contrib import admin
 
 
 urlpatterns = [
-    url(r'^admin/doc/',include('django.contrib.admindocs.urls')),
+    url(r'^/',include('django.contrib.admindocs.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^domains/', include("domains.urls")),
     url(r'^component/', include("component.urls")),

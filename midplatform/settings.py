@@ -158,7 +158,7 @@ STATICFILES_DIRS=[
 # 与前端layui返回数据格式
 RESULT = {"code":None,"msg":None,"count":None,"data":[]}
 
-
+finalData= {'code': None, 'msg': None, 'data': None}
 
 ###自定义状态码以及message信息
 

@@ -70,7 +70,7 @@ class sys_user(models.Model):
     )
     username = models.CharField(unique=True,null=True,max_length=100, verbose_name='用户名')
     nickname = models.CharField(null=True,max_length=100, verbose_name='显示名称')
-    password = fields.EncryptedCharField(null=True,max_length=100, verbose_name='显示名称')
+    password = fields.EncryptedCharField(null=True,max_length=500, verbose_name='显示名称')
     type = models.IntegerField(default=5,verbose_name='0-超级管理员，1-管理员，2-项目管理员，3-开发人员，4-测试人员，5-访客')
     salt = models.CharField(null=True,max_length=100, verbose_name='MD5密码盐')
     avatar = models.CharField(null=True,max_length=100, verbose_name='头像')
@@ -81,6 +81,7 @@ class sys_user(models.Model):
     deleted = models.IntegerField(default=0,db_index=True,choices=DEL_CHOICES, verbose_name='删除状态，锁定 正常')
     createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
 
 class sys_role(models.Model):
     """
@@ -95,7 +96,7 @@ class sys_role(models.Model):
     name = models.CharField(unique=True,null=True,max_length=100, verbose_name='用户名')
     code = models.CharField(null=True,max_length=100, verbose_name='显示名称')
     note =  models.CharField(null=True,max_length=100, verbose_name='显示名称')
-    deleted = models.IntegerField(db_index=True,choices=DEL_CHOICES, verbose_name='删除状态，锁定 正常')
+    deleted = models.IntegerField(default=0,db_index=True,choices=DEL_CHOICES, verbose_name='删除状态，锁定 正常')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 

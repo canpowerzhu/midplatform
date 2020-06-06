@@ -96,7 +96,7 @@ def addrecord(request):
         models.deployRecord.objects.create(**kwargs)
         front_respone = {'code': 2001, 'msg': None}
         front_respone['msg'] = 'success'
-        dingtalkmsg(res, 0)
+        # dingtalkmsg(res, 0)
         return JsonResponse(front_respone)
 
 
