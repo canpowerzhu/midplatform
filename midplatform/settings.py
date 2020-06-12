@@ -99,13 +99,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'midplatform',
         'USER':'root',
-        # 'HOST':'192.168.1.9',
-        # 'PASSWORD':'&*MoppoJS%^1',
         'HOST':'192.168.1.5',
         'PASSWORD':'123Moppo!@#',
-
-        # 'HOST':'127.0.0.1',
-        # 'PASSWORD': 'CaNp0wer',
         'PORT':3306,
     }
 }
