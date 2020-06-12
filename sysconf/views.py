@@ -7,7 +7,7 @@ import  json
 from django.core.paginator import Paginator
 from django.db.models import Q
 from common import ossupload
-from django.contrib.auth.hashers import make_password, check_password
+
 
 
 ##路由配置
