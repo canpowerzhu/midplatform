@@ -321,7 +321,7 @@ def sysRole(request):
 
 
     except:
-        return JsonResponse({'code': 2002 , 'msg': 'success'})
+        return JsonResponse({'code': 2001 , 'msg': 'success'})
 
     return JsonResponse({'code':2001,'msg':'success'})
 
@@ -334,15 +334,30 @@ def sysuserlogin(request):
         for i in res:
             param_dict[i.split('=')[0]]=i.split('=')[1]
     originPassword = Aescrypt(param_dict['password'],1)['jiemi']
-    print(originPassword)
     res =  models.sys_user.objects.filter(username=param_dict['username']).count()
     if res == 0:
         return JsonResponse({'code':2003,'msg':'fail','data':'用户不存在'})
 
     dbPassword = model_to_dict(models.sys_user.objects.filter(username=param_dict['username']).first())['password']
     if originPassword == dbPassword:
-        return JsonResponse({'code':2000,'msg':'success','data':'登陆成功'})
+        router=models.sys_menu.objects.filter(deleted=0).filter(~Q(type=2)).values('component', 'hidden', 'icon', 'sort', 'id',
+                                                                            'KeepAlive', 'parentId', 'path', 'redirect',
+                                                                            'routerName', 'target', 'title', 'type',
+                                                                            'code')
+        return JsonResponse({'code':2000,'msg':'success','data':list(router)})
     return JsonResponse({'code':2004,'msg':'fail','data':'密码错误'})
+
+
+def codeMsg(request):
+    if request.method == 'GET' or request.method == 'get':
+        codeMsgDic={
+            2001: '成功',
+            2002:'两次输入密码不一致',
+            2003:'用户不存在',
+            2004:'密码错误',
+
+        }
+        return  JsonResponse(codeMsgDic)
 
 
 

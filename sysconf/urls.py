@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^setPassword/', views.setPassword),
     url(r'^sysusergrant/', views.sysusergrant),
     url(r'^sysuserlogin/', views.sysuserlogin),
+    url(r'^codeMsg/', views.codeMsg),
 ]
 
