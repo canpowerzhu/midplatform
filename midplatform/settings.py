@@ -157,8 +157,22 @@ finalData= {'code': None, 'msg': None, 'data': None}
 
 ###自定义状态码以及message信息
 
-CodeMsg = {
-    ''
+codeMsg = {
+    2001: '成功',
+    2002: '两次输入密码不一致',
+    2003: '用户不存在',
+    2004: '密码错误',
+}
+
+
+### 登陆成功返回字典
+loginDic = {
+    'access_token':None,
+    'refresh_token': None,
+    'expires_in':None,
+    'permissions': None,
+    'info': None,
+    'roles':None
 }
 
 DOMAIN ={

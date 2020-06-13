@@ -3,11 +3,10 @@ from sysconf import models
 from midplatform import settings
 from django.forms.models import model_to_dict
 from common import midplatformcrypt
-import  json
+import json
 from django.core.paginator import Paginator
 from django.db.models import Q
 from common import ossupload
-
 
 
 ##路由配置
@@ -18,12 +17,17 @@ def getrouter(request):
     :return:
     """
     if request.method == 'GET' or request.method == 'get':
-        router = models.sys_menu.objects.filter(deleted=0).filter(~Q(type=2)).values('component','hidden','icon','sort','id','KeepAlive','parentId','path','redirect','routerName','target','title','type','code')
+        router = models.sys_menu.objects.filter(deleted=0).filter(~Q(type=2)).values('component', 'hidden', 'icon',
+                                                                                     'sort', 'id', 'KeepAlive',
+                                                                                     'parentId', 'path', 'redirect',
+                                                                                     'routerName', 'target', 'title',
+                                                                                     'type', 'code')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['data'] = list(router)
         return JsonResponse(settings.RESULT)
+
 
 def router(request):
     """
@@ -32,7 +36,9 @@ def router(request):
     :return:
     """
     if request.method == 'GET' or request.method == 'get':
-        router = models.sys_menu.objects.filter(deleted=0).values('component','hidden','icon','sort','id','KeepAlive','parentId','path','redirect','routerName','target','title','type','code')
+        router = models.sys_menu.objects.filter(deleted=0).values('component', 'hidden', 'icon', 'sort', 'id',
+                                                                  'KeepAlive', 'parentId', 'path', 'redirect',
+                                                                  'routerName', 'target', 'title', 'type', 'code')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -74,9 +80,9 @@ def ossconf(request):
     else:
         # print(res['accessSecret'])
         cryptdata = Aescrypt(res['accessSecret'])
-        res['accessSecret']= cryptdata['jiami']
+        res['accessSecret'] = cryptdata['jiami']
         del res['id']
-        finaldata = {'code': 2001, 'msg': 'success','data':None}
+        finaldata = {'code': 2001, 'msg': 'success', 'data': None}
         finaldata['data'] = res
         return JsonResponse(finaldata)
 
@@ -85,7 +91,7 @@ def modifyossconf(request):
     if request.method == 'POST':
         import json
         res = json.loads(request.body.decode('utf-8'))
-        print(res,type(res))
+        print(res, type(res))
         count = models.ossconf.objects.all().count()
         if count == 0:
             models.ossconf.objects.create(**res)
@@ -111,11 +117,12 @@ def changemailserver(request):
 
 
 def test(request):
-    plain_text = request.GET.get('plain_text')
-    return JsonResponse(Aescrypt(plain_text,0))
+    from common import tokenserver
+    return HttpResponse(tokenserver.create_token('admin'))
 
-def Aescrypt(reqsecret,type):
 
+
+def Aescrypt(reqsecret, type):
     back_data = {}
     ###这里初始化加密对象 传入key 初始化密钥, 以及对应的偏移量
     text = midplatformcrypt.midowncrppt('=====bWlkcGxhdGZvcm0gYXV0aA=====', 'bWlkcGxhdGZvcm0g')
@@ -127,7 +134,6 @@ def Aescrypt(reqsecret,type):
         jie_mi = text.decrypt(reqsecret)
         back_data['jiemi'] = jie_mi
     return back_data
-
 
 
 def sysuser(request):
@@ -142,13 +148,13 @@ def sysuser(request):
         """
         sysUserType = int(request.GET.get('type'))
         if sysUserType == None:
-            return JsonResponse({'code':2002,'msg':'fail','data':'type未必传参数'})
-        limit = int(request.GET.get('limit',default=10))
+            return JsonResponse({'code': 2002, 'msg': 'fail', 'data': 'type未必传参数'})
+        limit = int(request.GET.get('limit', default=10))
         page = int(request.GET.get('page', default=1))
         username = request.GET.get('username')
         nickname = request.GET.get('nickname')
         phone = request.GET.get('phone')
-        kwargs ={
+        kwargs = {
             ##动态查询条件
         }
         if username != None:
@@ -158,8 +164,9 @@ def sysuser(request):
         if phone != None:
             kwargs['phone'] = phone
 
-
-        sysUser = models.sys_user.objects.filter(type__gte=sysUserType,deleted=0).filter(**kwargs).order_by('-createTime').values('id','username','nickname','password','salt','avatar','gender','email','phone','status','type','deleted','createTime','updateTime')
+        sysUser = models.sys_user.objects.filter(type__gte=sysUserType, deleted=0).filter(**kwargs).order_by(
+            '-createTime').values('id', 'username', 'nickname', 'password', 'salt', 'avatar', 'gender', 'email',
+                                  'phone', 'status', 'type', 'deleted', 'createTime', 'updateTime')
         paginator = Paginator(sysUser, limit)
         # 获取第2页的数据
         pageData = paginator.page(page)
@@ -186,9 +193,9 @@ def sysuser(request):
         res = json.loads(request.body.decode('utf-8'))
         if 'avatar' in res.keys():
             if res['avatar'].split('/')[0] != 'midplatform':
-                avatarPath=ossupload.uploadBase64Pic(res['avatar'])
+                avatarPath = ossupload.uploadBase64Pic(res['avatar'])
                 if avatarPath != None:
-                    res['avatar'] =avatarPath
+                    res['avatar'] = avatarPath
                 else:
                     settings.RESULT['code'] = 2002
                     settings.RESULT['msg'] = 'fail'
@@ -200,9 +207,9 @@ def sysuser(request):
     elif request.method == 'POST' or request.method == 'post':
         sysUserDict = json.loads(request.body.decode('utf-8'))
         if sysUserDict['avatar'] != None:
-            avatarPath=ossupload.uploadBase64Pic(sysUserDict['avatar'])
+            avatarPath = ossupload.uploadBase64Pic(sysUserDict['avatar'])
             if avatarPath != None:
-                sysUserDict['avatar'] =avatarPath
+                sysUserDict['avatar'] = avatarPath
             else:
                 settings.RESULT['code'] = 2002
                 settings.RESULT['msg'] = 'fail'
@@ -219,34 +226,31 @@ def sysusergrant(request):
     if request.method == 'GET' or request.method == 'get':
         id = request.GET.get('id')
         res = models.sys_user_role.objects.filter(user_id=id).values('role_id')
-        return JsonResponse({"code":2001,"msg":"success","data":{"roleIds":list(res)}})
+        return JsonResponse({"code": 2001, "msg": "success", "data": {"roleIds": list(res)}})
 
     if request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
-        roleIds =res['roleIds']
+        roleIds = res['roleIds']
         print(roleIds, type(roleIds))
         if len(roleIds) == 0:
-            return JsonResponse({'code':2002,'msg':'fail','data':'授权ID为空'})
+            return JsonResponse({'code': 2002, 'msg': 'fail', 'data': '授权ID为空'})
         else:
             for i in roleIds:
-                object, created = models.sys_user_role.objects.update_or_create(user_id=res['id'],role_id=i)
-                print(object,created)
-        return JsonResponse({'code':2001,'msg':'success'})
-
-
-
-
+                object, created = models.sys_user_role.objects.update_or_create(user_id=res['id'], role_id=i)
+                print(object, created)
+        return JsonResponse({'code': 2001, 'msg': 'success'})
 
 
 def sysRoleSelect(request):
     if request.method == 'GET' or request.method == 'get':
-        res = models.sys_role.objects.values('name','id')
-        return JsonResponse({'code':2000,'msg':'success','data':list(res)})
+        res = models.sys_role.objects.values('name', 'id')
+        return JsonResponse({'code': 2000, 'msg': 'success', 'data': list(res)})
+
 
 def sysRoleMenuSelect(request):
     if request.method == 'GET' or request.method == 'get':
         id = request.GET.get('id')
-        res = models.sys_role_menu.objects.filter(role_id=id).values_list('permission_id',flat=True)
+        res = models.sys_role_menu.objects.filter(role_id=id).values_list('permission_id', flat=True)
         return JsonResponse({"code": 2001, "msg": "success", "data": list(res)})
 
     if request.method == 'PUT' or request.method == 'put':
@@ -268,23 +272,21 @@ def setPassword(request):
     res = json.loads(request.body.decode('utf-8'))
     if request.method == 'PUT' or request.method == 'put':
         if 'id' not in res.keys():
-            return JsonResponse({'code':2002,'msg':'fail','data':'未携带用户ID'})
+            return JsonResponse({'code': 2002, 'msg': 'fail', 'data': '未携带用户ID'})
         if res['password'] == res['confirm']:
-            crypt= Aescrypt(res['password'],1)
+            crypt = Aescrypt(res['password'], 1)
             models.sys_user.objects.filter(pk=res['id']).update(password=crypt['jiemi'])
-            return JsonResponse({'code':2001,'msg':'success'})
+            return JsonResponse({'code': 2001, 'msg': 'success'})
         else:
             return JsonResponse({'code': 2002, 'msg': 'fail', 'data': '两次输入密码不一致'})
 
 
-
 def sysRole(request):
-
     if request.method == 'GET' or request.method == 'get':
         code = request.GET.get('code')
         name = request.GET.get('name')
         kwargs2 = {}
-        if  code != None:
+        if code != None:
             kwargs2['code'] = code
         if name != None:
             kwargs2['name'] = name
@@ -296,9 +298,7 @@ def sysRole(request):
 
         return JsonResponse(settings.finalData)
 
-
-
-    kwargs={
+    kwargs = {
         ###动态参数拼接
     }
     res = json.loads(request.body.decode('utf-8'))
@@ -310,7 +310,6 @@ def sysRole(request):
         kwargs['note'] = res['note']
     try:
         if request.method == 'POST' or request.method == 'post':
-
             models.sys_role.objects.create(**kwargs)
 
         if request.method == 'PUT' or request.method == 'put':
@@ -321,47 +320,42 @@ def sysRole(request):
 
 
     except:
-        return JsonResponse({'code': 2001 , 'msg': 'success'})
+        return JsonResponse({'code': 2001, 'msg': 'success'})
 
-    return JsonResponse({'code':2001,'msg':'success'})
+    return JsonResponse({'code': 2001, 'msg': 'success'})
 
 
 def sysuserlogin(request):
     param_dict = {}
     if request.method == 'POST' or request.method == 'post':
-        query_param=request.get_full_path().split('?')[1]
+        query_param = request.get_full_path().split('?')[1]
         res = query_param.split('&')
         for i in res:
-            param_dict[i.split('=')[0]]=i.split('=')[1]
-    originPassword = Aescrypt(param_dict['password'],1)['jiemi']
-    res =  models.sys_user.objects.filter(username=param_dict['username']).count()
+            param_dict[i.split('=')[0]] = i.split('=')[1]
+    originPassword = Aescrypt(param_dict['password'], 1)['jiemi']
+    res = models.sys_user.objects.filter(username=param_dict['username']).count()
     if res == 0:
-        return JsonResponse({'code':2003,'msg':'fail','data':'用户不存在'})
+        return JsonResponse({'code': 2003, 'msg': 'fail', 'data': '用户不存在'})
 
     dbPassword = model_to_dict(models.sys_user.objects.filter(username=param_dict['username']).first())['password']
     if originPassword == dbPassword:
-        router=models.sys_menu.objects.filter(deleted=0).filter(~Q(type=2)).values('component', 'hidden', 'icon', 'sort', 'id',
-                                                                            'KeepAlive', 'parentId', 'path', 'redirect',
-                                                                            'routerName', 'target', 'title', 'type',
-                                                                            'code')
-        return JsonResponse({'code':2000,'msg':'success','data':list(router)})
-    return JsonResponse({'code':2004,'msg':'fail','data':'密码错误'})
+        info =model_to_dict(models.sys_user.objects.get(username=param_dict['username']))
+        pklist= list(models.sys_user_role.objects.filter(user_id=int(info['id'])).values_list('role_id',flat=True))
+        roles = models.sys_role.objects.filter(id__in=pklist).values_list('code',flat=True)
+        permissions = models.sys_menu.objects.filter(type=2).values_list('code',flat=True)
+        from common import tokenserver
+        access_token,refresh_token= tokenserver.create_token(param_dict['username'])
+        settings.loginDic['access_token'] =access_token
+        settings.loginDic['refresh_token'] =refresh_token
+        settings.loginDic['expires_in'] =1800
+        settings.loginDic['permissions'] = list(permissions)
+        settings.loginDic['roles'] = list(roles)
+        settings.loginDic['info'] = info
+        # print(settings.loginDic)
+        return JsonResponse({'code': 2001, 'msg': 'success', 'data':settings.loginDic})
+    return JsonResponse({'code': 2004, 'msg': 'fail', 'data': '密码错误'})
 
 
 def codeMsg(request):
     if request.method == 'GET' or request.method == 'get':
-        codeMsgDic={
-            2001: '成功',
-            2002:'两次输入密码不一致',
-            2003:'用户不存在',
-            2004:'密码错误',
-
-        }
-        return  JsonResponse(codeMsgDic)
-
-
-
-
-
-
-
+        return JsonResponse(settings.codeMsg)

@@ -197,13 +197,3 @@ def proTime(res):
     return int(firetime)
 
 
-
-# ## celery 定时任务
-# from . import tasks
-# def add(request,*args,**kwargs):
-#   res = tasks.add.delay(1,2)
-#   result = {'code': 0, 'msg': '这是一个后台任务'}
-#   print(res)
-#   return JsonResponse({'code':'successful','task_id':res.task_id})
-#   # result = {'code': 0, 'msg': '这是一个后台任务'}
-#   # return JsonResponse(result)

@@ -6,24 +6,28 @@ DatabaseWrapper.data_types = DatabaseWrapper._data_types
 
 
 
-class Tasklist(models.Model):
-    TYPE_CHOICES = (
-        (0, 'get'),
-        (1, 'post'),
-    )
-    STATUS_CHOICES = (
-        (0, 'normal'),
-        (1,'warnning'),
-        (2, 'fatal')
-    )
-    taskproject = models.CharField(max_length=500, verbose_name='监控任务所属项目')
-    taskname = models.CharField(max_length=500, verbose_name='监控任务名称')
-    taskurl = models.CharField(max_length=500, verbose_name='监控任务名称')
-    req_method = models.IntegerField(choices=TYPE_CHOICES, verbose_name='请求方式get/post')
-    taskrate = models.IntegerField(verbose_name='执行频率 5，10, 30mins')
-    taskstatus = models.IntegerField(choices=STATUS_CHOICES, verbose_name='任务状态 正常，异常，不可用')
-    alarmrule = models.IntegerField(verbose_name="0-不包含匹配内容报警 1-包含匹配内容报警")
-    postbody = jsonfield.JSONField()
-    rulecontent = models.CharField(max_length=500, verbose_name="规则内容")
-    del_flag = models.IntegerField(default=1, verbose_name='0 删除，1 正常')
-    avaliable_flag = models.IntegerField(default=1, verbose_name='0 禁用，1 启用')
+class taskList(models.Model):
+    """
+    监控任务列表
+    """
+    taskProject = models.CharField(max_length=500, verbose_name='监控任务所属项目')
+    taskName = models.CharField(max_length=500, verbose_name='监控任务名称')
+    taskUrl = models.CharField(max_length=500, verbose_name='监控任务地址')
+    reqMethod = models.IntegerField(default=0,verbose_name='请求方式0-get 1-post')
+    taskRate = models.IntegerField(verbose_name='执行频率 5，10, 30mins')
+    taskStatus = models.IntegerField(default=0, verbose_name='任务状态 0-正常，1-警告，2-致命')
+    alarmRule = models.IntegerField(verbose_name="0-不包含匹配内容报警 1-包含匹配内容报警")
+    postBody =  models.CharField(max_length=500,blank=True,verbose_name='请求体内容')
+    ruleContent = models.CharField(blank=True,max_length=500, verbose_name="规则内容")
+    deleted = models.IntegerField(default=1, verbose_name='0 删除，1 正常')
+    disabled = models.IntegerField(default=1, verbose_name='0 禁用，1 启用')
+    createTime = models.DateTimeField(auto_now=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
+class scanLog(models.Model):
+    """
+    监控日志
+    """
+    taskProject = models.CharField(max_length=500, verbose_name='监控任务所属项目')
+    taskName = models.CharField(max_length=500, verbose_name='监控任务名称')
+

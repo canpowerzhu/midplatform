@@ -155,3 +155,14 @@ class ossconf(models.Model):
     bucketName = models.CharField(max_length=500, verbose_name='bucketname')
 
 
+class baseConfig(models.Model):
+    name=models.CharField(max_length=50,verbose_name='配置名称')
+    confKey=models.CharField(max_length=50,verbose_name='配置键')
+    confValue=models.CharField(max_length=50,verbose_name='配置值')
+    category=models.CharField(blank=True,max_length=255,verbose_name='分类')
+    description=models.CharField(blank=True,max_length=200,verbose_name='描述')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
+
+
