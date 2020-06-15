@@ -9,6 +9,15 @@ from django.db.models import Q
 from common import ossupload
 
 
+# def checkLogin(func):
+#     def wrapper(request,*args,**kwargs):
+#         is_login=request.session.get('IS_LOGIN',False)
+#         if is_login:
+#             return func(request,*args,**kwargs)
+#         else:
+#             return  redirect('/Index/')
+#     return  wrapper
+
 ##路由配置
 def getrouter(request):
     """
@@ -16,6 +25,8 @@ def getrouter(request):
     :param request:
     :return:
     """
+    auth = request.META.get('HTTP_AUTHORIZATION')
+    print('这是登陆后获取的auth: %s' % auth)
     if request.method == 'GET' or request.method == 'get':
         router = models.sys_menu.objects.filter(deleted=0).filter(~Q(type=2)).values('component', 'hidden', 'icon',
                                                                                      'sort', 'id', 'KeepAlive',
@@ -35,6 +46,8 @@ def router(request):
     :param request:
     :return:
     """
+    auth = request.META.get('HTTP_AUTHORIZATION')
+    print(auth)
     if request.method == 'GET' or request.method == 'get':
         router = models.sys_menu.objects.filter(deleted=0).values('component', 'hidden', 'icon', 'sort', 'id',
                                                                   'KeepAlive', 'parentId', 'path', 'redirect',
@@ -69,38 +82,32 @@ def router(request):
 
 
 ## oss配置相关两个接口
+
 def ossconf(request):
-    try:
-        res = model_to_dict(models.ossconf.objects.all().first())
-
-    except:
-        finaldata = {'code': 2002, 'msg': 'fail', 'data': None}
-        del finaldata['data']
-        return JsonResponse(finaldata)
-    else:
-        # print(res['accessSecret'])
-        cryptdata = Aescrypt(res['accessSecret'])
-        res['accessSecret'] = cryptdata['jiami']
-        del res['id']
-        finaldata = {'code': 2001, 'msg': 'success', 'data': None}
-        finaldata['data'] = res
+    if request.method == 'GET' or request.method == 'get':
+        try:
+            res = model_to_dict(models.ossconf.objects.all().first())
+        except:
+            finaldata = {'code': 2002, 'msg': 'fail', 'data': None}
+            del finaldata['data']
+        else:
+            finaldata = {'code': 2001, 'msg': 'success', 'data': None}
+            finaldata['data'] = res
         return JsonResponse(finaldata)
 
-
-def modifyossconf(request):
-    if request.method == 'POST':
+    if request.method == 'POST' or request.method == 'post':
         import json
         res = json.loads(request.body.decode('utf-8'))
-        print(res, type(res))
-        count = models.ossconf.objects.all().count()
-        if count == 0:
-            models.ossconf.objects.create(**res)
-        else:
-            models.ossconf.objects.update(**res)
+        models.ossconf.objects.update_or_create(id=res['id'],defaults=res)
 
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
     return JsonResponse(settings.RESULT)
+
+
+
+
+
 
 
 ## 邮件配置相关
@@ -117,8 +124,11 @@ def changemailserver(request):
 
 
 def test(request):
-    from common import tokenserver
-    return HttpResponse(tokenserver.create_token('admin'))
+    auth = request.META.get('HTTP_AUTHORIZATION')
+    print(auth )
+    # from common import checklogin
+    # checklogin.get_authorization_header(request)
+    return HttpResponse('ok')
 
 
 
@@ -263,8 +273,6 @@ def sysRoleMenuSelect(request):
             models.sys_role_menu.objects.filter(role_id=res['id']).delete()
             for i in permissionId:
                 models.sys_role_menu.objects.create(role_id=res['id'], permission_id=i)
-                # object, created = models.sys_role_menu.objects.update_or_create(role_id=res['id'], permission_id=i)
-                # print(object, created)
         return JsonResponse({'code': 2001, 'msg': 'success'})
 
 
@@ -326,6 +334,7 @@ def sysRole(request):
 
 
 def sysuserlogin(request):
+
     param_dict = {}
     if request.method == 'POST' or request.method == 'post':
         query_param = request.get_full_path().split('?')[1]
@@ -340,6 +349,9 @@ def sysuserlogin(request):
     dbPassword = model_to_dict(models.sys_user.objects.filter(username=param_dict['username']).first())['password']
     if originPassword == dbPassword:
         info =model_to_dict(models.sys_user.objects.get(username=param_dict['username']))
+
+        info['password'] = Aescrypt(info['password'],0)['jiami']
+        print(info)
         pklist= list(models.sys_user_role.objects.filter(user_id=int(info['id'])).values_list('role_id',flat=True))
         roles = models.sys_role.objects.filter(id__in=pklist).values_list('code',flat=True)
         permissions = models.sys_menu.objects.filter(type=2).values_list('code',flat=True)
@@ -354,6 +366,7 @@ def sysuserlogin(request):
         # print(settings.loginDic)
         return JsonResponse({'code': 2001, 'msg': 'success', 'data':settings.loginDic})
     return JsonResponse({'code': 2004, 'msg': 'fail', 'data': '密码错误'})
+
 
 
 def codeMsg(request):
