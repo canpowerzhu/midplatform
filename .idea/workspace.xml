@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7b022e7d-0758-4bb2-9231-9594f282b774" name="Default Changelist" comment="">
+    <list default="true" id="7b022e7d-0758-4bb2-9231-9594f282b774" name="Default Changelist" comment=":art:&#9;自主生">
+      <change afterPath="$PROJECT_DIR$/common/baseconfig.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sysconf/migrations/0006_auto_20200617_1033.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/checklogin.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/checklogin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/ossupload.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/ossupload.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/tokenserver.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/tokenserver.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/domains/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/domains/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/midplatform/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/midplatform/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mophealth/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/mophealth/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mophealth/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mophealth/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sysconf/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/views.py" afterDir="false" />
     </list>
@@ -36,7 +46,51 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Django server.midplatform">
+    <configuration name="baseconfig" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="midplatform" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/common" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/common/baseconfig.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="checklogin" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="midplatform" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/common" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/common/checklogin.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="midplatform" type="Python.DjangoServer" factoryName="Django server">
       <module name="midplatform" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -61,6 +115,12 @@
       <option name="customRunCommand" value="" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.baseconfig" />
+        <item itemvalue="Python.checklogin" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -133,7 +193,26 @@
       <workItem from="1591152288939" duration="12575000" />
       <workItem from="1591240089495" duration="12934000" />
       <workItem from="1591600703212" duration="4580000" />
+      <workItem from="1592037080879" duration="4200000" />
+      <workItem from="1592042646168" duration="3236000" />
+      <workItem from="1592045919963" duration="4089000" />
+      <workItem from="1592186037878" duration="54356000" />
     </task>
+    <task id="LOCAL-00001" summary=":art:&#9;新增状态码信息接口，用户登陆完成">
+      <created>1592034738784</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1592034738784</updated>
+    </task>
+    <task id="LOCAL-00002" summary=":art: 优化oss接口，token接入至缓存">
+      <created>1592228990423</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1592228990423</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,70 +256,84 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="merge" />
-    <option name="LAST_COMMIT_MESSAGE" value="merge" />
+    <MESSAGE value=":art:&#9;新增状态码信息接口，用户登陆完成" />
+    <MESSAGE value=":art: 优化oss接口，token接入至缓存" />
+    <option name="LAST_COMMIT_MESSAGE" value=":art: 优化oss接口，token接入至缓存" />
   </component>
   <component name="WindowStateProjectService">
     <state x="254" y="85" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1589959723346">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state x="254" y="85" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.860@0.0.1600.860" timestamp="1589959723346" />
-    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1590414708847">
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1592216434218">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590414708847" />
+    <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1592216434218" />
+    <state x="560" y="112" key="CommitChangelistDialog2" timestamp="1592228987240">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="560" y="112" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1592228987240" />
     <state x="580" y="185" key="FileChooserDialogImpl" timestamp="1588053786228">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state x="580" y="185" key="FileChooserDialogImpl/0.0.1600.860@0.0.1600.860" timestamp="1588053786228" />
-    <state width="1876" height="356" key="GridCell.Tab.0.bottom" timestamp="1592034037108">
+    <state width="1876" height="313" key="GridCell.Tab.0.bottom" timestamp="1592401834961">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.bottom/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="356" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1592034037108" />
-    <state width="1876" height="356" key="GridCell.Tab.0.center" timestamp="1592034037108">
+    <state width="1876" height="313" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834961" />
+    <state width="1876" height="313" key="GridCell.Tab.0.center" timestamp="1592401834961">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.center/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="356" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1592034037108" />
-    <state width="1876" height="356" key="GridCell.Tab.0.left" timestamp="1592034037108">
+    <state width="1876" height="313" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834961" />
+    <state width="1876" height="313" key="GridCell.Tab.0.left" timestamp="1592401834960">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.left/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="356" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1592034037108" />
-    <state width="1876" height="356" key="GridCell.Tab.0.right" timestamp="1592034037108">
+    <state width="1876" height="313" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834960" />
+    <state width="1876" height="313" key="GridCell.Tab.0.right" timestamp="1592401834961">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.right/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="356" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1592034037108" />
-    <state width="1876" height="2" key="GridCell.Tab.1.bottom" timestamp="1591151586165">
+    <state width="1876" height="313" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834961" />
+    <state width="1876" height="450" key="GridCell.Tab.1.bottom" timestamp="1592300286234">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.bottom/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="2" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1591151586165" />
-    <state width="1876" height="2" key="GridCell.Tab.1.center" timestamp="1591151586165">
+    <state width="1876" height="450" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286234" />
+    <state width="1876" height="450" key="GridCell.Tab.1.center" timestamp="1592300286234">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.center/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="2" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1591151586165" />
-    <state width="1876" height="2" key="GridCell.Tab.1.left" timestamp="1591151586165">
+    <state width="1876" height="450" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286234" />
+    <state width="1876" height="450" key="GridCell.Tab.1.left" timestamp="1592300286233">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.left/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="2" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1591151586165" />
-    <state width="1876" height="2" key="GridCell.Tab.1.right" timestamp="1591151586165">
+    <state width="1876" height="450" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286233" />
+    <state width="1876" height="450" key="GridCell.Tab.1.right" timestamp="1592300286234">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.right/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="2" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1591151586165" />
-    <state x="521" y="12" width="998" height="708" key="SettingsEditor" timestamp="1590811682043">
+    <state width="1876" height="450" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286234" />
+    <state x="521" y="12" width="998" height="708" key="SettingsEditor" timestamp="1592298407387">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="434" y="10" width="998" height="708" key="SettingsEditor/0.0.1600.860@0.0.1600.860" timestamp="1589959885700" />
-    <state x="521" y="12" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1590811682043" />
-    <state x="744" y="311" key="git4idea.merge.GitMergeDialog" timestamp="1591963255514">
+    <state x="521" y="12" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1592298407387" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1592229001542">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="744" y="311" key="git4idea.merge.GitMergeDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1591963255514" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1592229001542" />
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.dvcs.ui.CompareBranchesDialog" timestamp="1592035513324">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.dvcs.ui.CompareBranchesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1592035513324" />
+    <state x="744" y="311" key="git4idea.merge.GitMergeDialog" timestamp="1592035449469">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="744" y="311" key="git4idea.merge.GitMergeDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1592035449469" />
     <state x="463" y="180" width="672" height="678" key="search.everywhere.popup" timestamp="1589873748646">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
@@ -256,5 +349,9 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/midplatform$checklogin.coverage" NAME="checklogin Coverage Results" MODIFIED="1592298948093" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+    <SUITE FILE_PATH="coverage/midplatform$baseconfig.coverage" NAME="baseconfig Coverage Results" MODIFIED="1592398640768" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
   </component>
 </project>

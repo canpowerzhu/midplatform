@@ -2,23 +2,15 @@ from django.http import HttpResponse, JsonResponse
 from sysconf import models
 from midplatform import settings
 from django.forms.models import model_to_dict
-from common import midplatformcrypt
 import json
 from django.core.paginator import Paginator
 from django.db.models import Q
-from common import ossupload
+from common import ossupload,midplatformcrypt,tokenserver
 
-
-# def checkLogin(func):
-#     def wrapper(request,*args,**kwargs):
-#         is_login=request.session.get('IS_LOGIN',False)
-#         if is_login:
-#             return func(request,*args,**kwargs)
-#         else:
-#             return  redirect('/Index/')
-#     return  wrapper
+isLogin=tokenserver.isLogin
 
 ##路由配置
+# @tokenserver.isLogin
 def getrouter(request):
     """
     当前用户所拥有的权限菜单获取
@@ -26,9 +18,19 @@ def getrouter(request):
     :return:
     """
     auth = request.META.get('HTTP_AUTHORIZATION')
-    print('这是登陆后获取的auth: %s' % auth)
+    from common import tokenserver
+    # print("这是登陆获取的auth %s" %auth)
+    username = tokenserver.get_token(auth)['username']
+    # print("这是登陆user %s" %username)
+    user_id = models.sys_user.objects.filter(username=username).values('id').first()['id']
+    # print("这是user_id %s" % user_id)
+    roleid = models.sys_user_role.objects.filter(user_id=int(user_id)).values('role_id').first()['role_id']
+    # print("roleid %s" % roleid)
+    rolemenu = models.sys_role_menu.objects.filter(role_id=int(roleid)).values_list('permission_id',flat=True)
+    rolemenuList = list(rolemenu)
+    # print(rolemenuList)
     if request.method == 'GET' or request.method == 'get':
-        router = models.sys_menu.objects.filter(deleted=0).filter(~Q(type=2)).values('component', 'hidden', 'icon',
+        router = models.sys_menu.objects.filter(id__in=rolemenuList).filter(deleted=1).filter(~Q(type=2)).values('component', 'hidden', 'icon',
                                                                                      'sort', 'id', 'KeepAlive',
                                                                                      'parentId', 'path', 'redirect',
                                                                                      'routerName', 'target', 'title',
@@ -49,7 +51,7 @@ def router(request):
     auth = request.META.get('HTTP_AUTHORIZATION')
     print(auth)
     if request.method == 'GET' or request.method == 'get':
-        router = models.sys_menu.objects.filter(deleted=0).values('component', 'hidden', 'icon', 'sort', 'id',
+        router = models.sys_menu.objects.filter(deleted=1).values('component', 'hidden', 'icon', 'sort', 'id',
                                                                   'KeepAlive', 'parentId', 'path', 'redirect',
                                                                   'routerName', 'target', 'title', 'type', 'code')
         settings.RESULT['count'] = router.count()
@@ -104,7 +106,19 @@ def ossconf(request):
         settings.RESULT['msg'] = 'success'
     return JsonResponse(settings.RESULT)
 
-
+def baseConfig(request):
+    if request.method == 'POST' or request.method == 'post':
+        res = json.loads(request.body.decode('utf-8'))
+        print(res,type(res))
+        models.baseConfig.objects.create(**res)
+        return HttpResponse('ok')
+    if request.method == 'GET' or request.method == 'get':
+        res = models.baseConfig.objects.all().values()
+        print(list(res))
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+        settings.RESULT['data'] = list(res)
+        return JsonResponse(settings.RESULT)
 
 
 
@@ -124,18 +138,19 @@ def changemailserver(request):
 
 
 def test(request):
-    auth = request.META.get('HTTP_AUTHORIZATION')
-    print(auth )
-    # from common import checklogin
-    # checklogin.get_authorization_header(request)
-    return HttpResponse('ok')
+    from common import baseconfig
+    res = baseconfig.getconfig()
+    return JsonResponse(res)
 
 
 
 def Aescrypt(reqsecret, type):
     back_data = {}
+    passKey=models.baseConfig.objects.filter(confKey='passKey').values('confValue').first()['confValue']
+    passOffset=models.baseConfig.objects.filter(confKey='passOffset').values('confValue').first()['confValue']
+
     ###这里初始化加密对象 传入key 初始化密钥, 以及对应的偏移量
-    text = midplatformcrypt.midowncrppt('=====bWlkcGxhdGZvcm0gYXV0aA=====', 'bWlkcGxhdGZvcm0g')
+    text = midplatformcrypt.midowncrppt(passKey, passOffset)
     if int(type) == 0:
         e = text.encrypt(reqsecret)
 
@@ -240,14 +255,17 @@ def sysusergrant(request):
 
     if request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
+
         roleIds = res['roleIds']
-        print(roleIds, type(roleIds))
-        if len(roleIds) == 0:
+
+        if roleIds == None:
             return JsonResponse({'code': 2002, 'msg': 'fail', 'data': '授权ID为空'})
         else:
-            for i in roleIds:
-                object, created = models.sys_user_role.objects.update_or_create(user_id=res['id'], role_id=i)
-                print(object, created)
+            # for i in roleIds:
+            object, created = models.sys_user_role.objects.update_or_create(user_id=res['userId'], role_id=roleIds)
+            print(object, created)
+            ##这里去更新用户表的字段type 区分类型
+            models.sys_user.objects.filter(pk=res['userId']).update(type=roleIds)
         return JsonResponse({'code': 2001, 'msg': 'success'})
 
 
@@ -351,14 +369,13 @@ def sysuserlogin(request):
         info =model_to_dict(models.sys_user.objects.get(username=param_dict['username']))
 
         info['password'] = Aescrypt(info['password'],0)['jiami']
-        print(info)
         pklist= list(models.sys_user_role.objects.filter(user_id=int(info['id'])).values_list('role_id',flat=True))
         roles = models.sys_role.objects.filter(id__in=pklist).values_list('code',flat=True)
         permissions = models.sys_menu.objects.filter(type=2).values_list('code',flat=True)
         from common import tokenserver
-        access_token,refresh_token= tokenserver.create_token(param_dict['username'])
+        access_token = tokenserver.create_token(param_dict['username'])
         settings.loginDic['access_token'] =access_token
-        settings.loginDic['refresh_token'] =refresh_token
+        # settings.loginDic['refresh_token'] =refresh_token
         settings.loginDic['expires_in'] =1800
         settings.loginDic['permissions'] = list(permissions)
         settings.loginDic['roles'] = list(roles)

@@ -101,7 +101,9 @@ def domainsync(request):
     同步各个账户的域名列表接口
     http://127.0.0.1:88/domains/domainsync/?account=adam.king
     """
-    api_url = settings.DOMAIN['getdomian_api_url']
+    from common import baseconfig
+    api_url = baseconfig.getconfig()['nameDomainApi']
+    api_url = baseconfig.getconfig()['nameDomainApi']
     account = request.GET.get('account')
     res = models.Domainaccount.objects.filter(username=account).first()
     token = res.token.strip()

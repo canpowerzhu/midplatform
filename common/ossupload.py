@@ -1,17 +1,9 @@
 import oss2
-from sysconf import models
-from django.forms.models import model_to_dict
-import hashlib
 import base64
-#
-res = model_to_dict(models.ossconf.objects.first())
-accessKey = res['accessKey']
-accessSecret = res['accessSecret']
-endPoint = res['endPoint']
-bucketName = res['bucketName']
-auth = oss2.Auth(accessKey, accessSecret)
-bucket = oss2.Bucket(auth, endPoint, bucketName)
-base_file_url = 'https://moppowar.oss-accelerate.aliyuncs.com/'
+from common import baseconfig
+auth = oss2.Auth(baseconfig.getconfig()['accessKey'], baseconfig.getconfig()['accessSecret'])
+bucket = oss2.Bucket(auth, baseconfig.getconfig()['endPoint'], baseconfig.getconfig()['bucketName'])
+base_file_url = baseconfig.getconfig()['baseFileUrl']
 
 def percentage(consumed_bytes, total_bytes):
     if total_bytes:

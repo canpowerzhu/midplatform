@@ -7,7 +7,6 @@ urlpatterns = [
     url(r'^router/', views.router),
     url(r'^changemailserver/', views.changemailserver),
     url(r'^ossconf/', views.ossconf),
-    # url(r'^modifyossconf/', views.modifyossconf),
     url(r'^mailserver/', views.mailserver),
     url(r'^getrouter/', views.getrouter),
     url(r'^sysuser/', views.sysuser),
@@ -21,5 +20,6 @@ urlpatterns = [
     url(r'^sysusergrant/', views.sysusergrant),
     url(r'^sysuserlogin/', views.sysuserlogin),
     url(r'^codeMsg/', views.codeMsg),
+    url(r'^baseConfig/', views.baseConfig),
 ]
 

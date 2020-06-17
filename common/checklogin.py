@@ -1,13 +1,29 @@
 # @Author  : kane.zhu
 # @Time    : 2020/6/15 19:13
 # @Software: PyCharm
+import redis
+from common import baseconfig
+redishost= baseconfig.getconfig()['redisAddr']
+redisPort= int(baseconfig.getconfig()['redisPort'])
 
-def redisOps(**tokenserials):
+redisPass= baseconfig.getconfig()['redisPass']
+r = redis.Redis(host=redishost, port=redisPort, decode_responses=True, password=redisPass)
+def keyset(**tokenserials):
     print(tokenserials)
-    import redis
-    r = redis.Redis(host='192.168.1.5', port=8006, decode_responses=True,password='**')
+
+
     r.set(tokenserials['k'],tokenserials['v'],tokenserials['expire'])
 
+def keyExists(key):
+    """
+    :param key: 登陆后得到的KEY
+    :return: int 0 不存在 1 存在
+    """
+    res= r.exists(key)
+    return res
 
-def checklogin():
-    pass
+
+
+
+
+

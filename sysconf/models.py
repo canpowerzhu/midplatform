@@ -97,8 +97,8 @@ class sys_role(models.Model):
     code = models.CharField(null=True,max_length=100, verbose_name='显示名称')
     note =  models.CharField(null=True,max_length=100, verbose_name='显示名称')
     deleted = models.IntegerField(default=0,db_index=True,choices=DEL_CHOICES, verbose_name='删除状态，锁定 正常')
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
-    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 
 class sys_role_menu(models.Model):
     """
@@ -131,8 +131,8 @@ class sys_webhoook(models.Model):
     keyword = models.CharField(max_length=100, verbose_name='安全信息自定义关键字')
     label = models.CharField(max_length=100, verbose_name='加签')
     ip_range = models.CharField(max_length=100, verbose_name='ip段')
-    create_time = models.DateTimeField(auto_now=True, verbose_name='创建时间')
-    update_time = models.DateTimeField(verbose_name='更新时间')
+    createTime = models.DateTimeField(auto_now=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(verbose_name='更新时间')
 
 class sys_alarm_log(models.Model):
     """
@@ -141,7 +141,8 @@ class sys_alarm_log(models.Model):
     name = models.CharField(max_length=300, verbose_name='告警名称')
     alarm_type = models.IntegerField(verbose_name='告警方式')
     alarm_content = models.TextField(verbose_name='告警内容')
-    create_time = models.DateTimeField(auto_now=True, verbose_name='创建时间')
+    createTime = models.DateTimeField(auto_now=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(verbose_name='更新时间')
 
 class ossconf(models.Model):
     """
@@ -161,8 +162,8 @@ class baseConfig(models.Model):
     confValue=models.CharField(max_length=50,verbose_name='配置值')
     category=models.CharField(blank=True,max_length=255,verbose_name='分类')
     description=models.CharField(blank=True,max_length=200,verbose_name='描述')
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
-    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 
 
 

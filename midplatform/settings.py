@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'project.apps.ProjectConfig',
     'sysconf.apps.SysconfConfig',
     'mophealth.apps.MophealthConfig',
-    'oauth2_provider',
 
 ]
 
@@ -163,44 +162,28 @@ codeMsg = {
     2002: '两次输入密码不一致',
     2003: '用户不存在',
     2004: '密码错误',
+    2005: '用户未登陆',
 }
 
 
 ### 登陆成功返回字典
 loginDic = {
     'access_token':None,
-    'refresh_token': None,
     'expires_in':None,
     'permissions': None,
     'info': None,
     'roles':None
 }
 
-DOMAIN ={
-    'getdomian_api_url':'https://api.name.com/v4/domains',
 
-}
+
+userDefaultPassword='Moppo123'
 
 
 ###文件上传最大size限制
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
 
 
-# #########################Celery Setting##################################
-# ### 定时器celery
-# import djcelery
-# djcelery.setup_loader()
-# CELERY_TIMEZONE = 'Asia/Shanghai'
-# ### celery 中间人 redis://passwd@redis服务所在的ip地址:端口/数据库号
-# CELERY_BROKER_URL = 'redis://192.168.1.5:8006/0'
-#
-# ### celery 中间人 redis://passwd@redis服务所在的ip地址:端口/数据库号
-# CELERY_RESULT_BACKEND = 'redis://192.168.1.5:8006/0'
-#
-# # celery内容等消息的格式设置
-# CELERY_ACCEPT_CONTENT = ['application/json', ]
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
 
 
-ossDomain='https://moppowar.oss-accelerate.aliyuncs.com'
+
