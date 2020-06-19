@@ -19,16 +19,11 @@ def getrouter(request):
     """
     auth = request.META.get('HTTP_AUTHORIZATION')
     from common import tokenserver
-    # print("这是登陆获取的auth %s" %auth)
     username = tokenserver.get_token(auth)['username']
-    # print("这是登陆user %s" %username)
     user_id = models.sys_user.objects.filter(username=username).values('id').first()['id']
-    # print("这是user_id %s" % user_id)
     roleid = models.sys_user_role.objects.filter(user_id=int(user_id)).values('role_id').first()['role_id']
-    # print("roleid %s" % roleid)
     rolemenu = models.sys_role_menu.objects.filter(role_id=int(roleid)).values_list('permission_id',flat=True)
     rolemenuList = list(rolemenu)
-    # print(rolemenuList)
     if request.method == 'GET' or request.method == 'get':
         router = models.sys_menu.objects.filter(id__in=rolemenuList).filter(deleted=1).filter(~Q(type=2)).values('component', 'hidden', 'icon',
                                                                                      'sort', 'id', 'KeepAlive',
@@ -109,16 +104,22 @@ def ossconf(request):
 def baseConfig(request):
     if request.method == 'POST' or request.method == 'post':
         res = json.loads(request.body.decode('utf-8'))
-        print(res,type(res))
         models.baseConfig.objects.create(**res)
-        return HttpResponse('ok')
+        settings.finalData['code']=2001
+        settings.finalData['msg'] = 'success'
+        return HttpResponse(settings.finalData)
     if request.method == 'GET' or request.method == 'get':
         res = models.baseConfig.objects.all().values()
-        print(list(res))
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['data'] = list(res)
         return JsonResponse(settings.RESULT)
+    if request.method == 'PUT' or request.method == 'put':
+        res = json.loads(request.body.decode('utf-8'))
+        models.sys_role.objects.filter(pk=res['id']).update(**res)
+        settings.finalData['code'] = 2001
+        settings.finalData['msg'] = 'success'
+        return HttpResponse(settings.finalData)
 
 
 

@@ -39,3 +39,7 @@ def get_token(token):
     t = itsdangerous.TimedJSONWebSignatureSerializer(salt, expires_in=TIME_OUT)
     user = t.loads(token)
     return user
+
+
+
+
