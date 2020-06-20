@@ -10,12 +10,27 @@ def tasklist(request):
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['data'] = list(res)
-        return JsonResponse(settings.RESULT)
 
-    if request.method == 'POST' or request.method == 'post':
+
+    elif request.method == 'POST' or request.method == 'post':
         res=json.loads(request.body.decode('utf-8'))
         models.taskList.objects.create(**res)
-        settings.finalData['code']=2001
-        settings.finalData['msg'] ='success'
+        settings.RESULT['code']=2001
+        settings.RESULT['msg'] ='success'
 
-        return JsonResponse(settings.finalData)
+
+    elif request.method == 'PUT' or request.method == 'put':
+        res = json.loads(request.body.decode('utf-8'))
+        print(res)
+        # models.taskList.objects.filter(pk=res['id']).update(**res)
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+
+    elif request.method == 'DELETE' or request.method == 'delete':
+        res = int(request.GET.get('id'))
+        models.taskList.objects.filter(pk=res['id']).update(deleted=0)
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+
+
+    return JsonResponse(settings.RESULT)

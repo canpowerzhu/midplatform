@@ -21,7 +21,7 @@ class taskList(models.Model):
     reqBody =  models.CharField(max_length=500,blank=True,verbose_name='请求体内容')
     reqHeader =  models.CharField(max_length=500,blank=True,verbose_name='请求头内容')
     ruleContent = models.CharField(blank=True,max_length=500, verbose_name="规则内容")
-    thresholdCount = models.IntegerField(default=3,max_length=5, verbose_name="连续几次超过阈值后报警")
+    thresholdCount = models.IntegerField(default=3, verbose_name="连续几次超过阈值后报警")
     deleted = models.IntegerField(default=1, verbose_name='0 删除，1 正常')
     disabled = models.IntegerField(default=1, verbose_name='0 禁用，1 启用')
     createTime = models.DateTimeField(auto_now=True, verbose_name='创建时间')

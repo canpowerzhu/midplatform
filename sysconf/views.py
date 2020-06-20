@@ -44,7 +44,6 @@ def router(request):
     :return:
     """
     auth = request.META.get('HTTP_AUTHORIZATION')
-    print(auth)
     if request.method == 'GET' or request.method == 'get':
         router = models.sys_menu.objects.filter(deleted=1).values('component', 'hidden', 'icon', 'sort', 'id',
                                                                   'KeepAlive', 'parentId', 'path', 'redirect',
