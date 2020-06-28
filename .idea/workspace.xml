@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7b022e7d-0758-4bb2-9231-9594f282b774" name="Default Changelist" comment=":art:&#9;自主生">
-      <change afterPath="$PROJECT_DIR$/common/baseconfig.py" afterDir="false" />
+    <list default="true" id="7b022e7d-0758-4bb2-9231-9594f282b774" name="Default Changelist" comment=":art:&#9;监控站点的增删改查 任务暂停开启">
+      <change afterPath="$PROJECT_DIR$/midcelery/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/alidtask/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/alidtask/tasks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/checkresult.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/gettask/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/gettask/tasks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/posttask/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/midcelery/posttask/tasks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mophealth/midscheduler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mophealth/migrations/0001_initial.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mophealth/migrations/0002_scanlog_taskurl.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/sysconf/migrations/0006_auto_20200617_1033.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/checklogin.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/checklogin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/ossupload.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/ossupload.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/tokenserver.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/tokenserver.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/domains/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/domains/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/midplatform/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/midplatform/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mophealth/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/mophealth/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mophealth/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/mophealth/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mophealth/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/mophealth/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sysconf/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sysconf/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/views.py" afterDir="false" />
     </list>
@@ -34,6 +43,13 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="hiddenUrls">
+      <set>
+        <option value="https://github.com/kanezhu1031/midplatform.git" />
+      </set>
+    </option>
+  </component>
   <component name="ProjectId" id="1af6M9AzWKMJdoIbCGhyG0THrl9" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -44,7 +60,8 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
   </component>
   <component name="RunManager" selected="Django server.midplatform">
     <configuration name="baseconfig" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -91,6 +108,50 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="config" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="midplatform" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/midcelery" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/midcelery/config.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="tokenserver" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="midplatform" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/common" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/common/tokenserver.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="midplatform" type="Python.DjangoServer" factoryName="Django server">
       <module name="midplatform" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -117,6 +178,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.config" />
+        <item itemvalue="Python.tokenserver" />
         <item itemvalue="Python.baseconfig" />
         <item itemvalue="Python.checklogin" />
       </list>
@@ -196,7 +259,10 @@
       <workItem from="1592037080879" duration="4200000" />
       <workItem from="1592042646168" duration="3236000" />
       <workItem from="1592045919963" duration="4089000" />
-      <workItem from="1592186037878" duration="54356000" />
+      <workItem from="1592186037878" duration="70702000" />
+      <workItem from="1592560837102" duration="15091000" />
+      <workItem from="1592877238984" duration="40888000" />
+      <workItem from="1593348462058" duration="3568000" />
     </task>
     <task id="LOCAL-00001" summary=":art:&#9;新增状态码信息接口，用户登陆完成">
       <created>1592034738784</created>
@@ -212,7 +278,28 @@
       <option name="project" value="LOCAL" />
       <updated>1592228990423</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary=":art:&#9;剥离公共配置读取方式 可配置">
+      <created>1592402329626</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1592402329626</updated>
+    </task>
+    <task id="LOCAL-00004" summary=":art:&#9;监控界面 查询与新增完成">
+      <created>1592572039931</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1592572039931</updated>
+    </task>
+    <task id="LOCAL-00005" summary=":art:&#9;更新健康检查界面">
+      <created>1592651092668</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1592651092668</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -246,86 +333,93 @@
             </State>
           </value>
         </entry>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
       </map>
-    </option>
-    <option name="OPEN_TABS">
-      <set>
-        <option value="1" />
-      </set>
     </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="merge" />
     <MESSAGE value=":art:&#9;新增状态码信息接口，用户登陆完成" />
     <MESSAGE value=":art: 优化oss接口，token接入至缓存" />
-    <option name="LAST_COMMIT_MESSAGE" value=":art: 优化oss接口，token接入至缓存" />
+    <MESSAGE value=":art:&#9;剥离公共配置读取方式 可配置" />
+    <MESSAGE value=":art:&#9;监控界面 查询与新增完成" />
+    <MESSAGE value=":art:&#9;更新健康检查界面" />
+    <MESSAGE value=":art:&#9;监控站点的增删改查 任务暂停开启" />
+    <option name="LAST_COMMIT_MESSAGE" value=":art:&#9;监控站点的增删改查 任务暂停开启" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="254" y="85" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1589959723346">
-      <screen x="0" y="0" width="1600" height="860" />
+    <state x="305" y="103" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593350567726">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="254" y="85" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1600.860@0.0.1600.860" timestamp="1589959723346" />
+    <state x="305" y="103" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1593350567726" />
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1592216434218">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="690" y="267" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1592216434218" />
-    <state x="560" y="112" key="CommitChangelistDialog2" timestamp="1592228987240">
+    <state x="560" y="112" key="CommitChangelistDialog2" timestamp="1593352015634">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="560" y="112" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1592228987240" />
+    <state x="560" y="112" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1593352015634" />
     <state x="580" y="185" key="FileChooserDialogImpl" timestamp="1588053786228">
       <screen x="0" y="0" width="1600" height="860" />
     </state>
     <state x="580" y="185" key="FileChooserDialogImpl/0.0.1600.860@0.0.1600.860" timestamp="1588053786228" />
-    <state width="1876" height="313" key="GridCell.Tab.0.bottom" timestamp="1592401834961">
+    <state width="1876" height="325" key="GridCell.Tab.0.bottom" timestamp="1593352015657">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.bottom/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="313" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834961" />
-    <state width="1876" height="313" key="GridCell.Tab.0.center" timestamp="1592401834961">
+    <state width="1876" height="325" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1593352015657" />
+    <state width="1876" height="325" key="GridCell.Tab.0.center" timestamp="1593352015657">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.center/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="313" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834961" />
-    <state width="1876" height="313" key="GridCell.Tab.0.left" timestamp="1592401834960">
+    <state width="1876" height="325" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1593352015657" />
+    <state width="1876" height="325" key="GridCell.Tab.0.left" timestamp="1593352015657">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.left/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="313" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834960" />
-    <state width="1876" height="313" key="GridCell.Tab.0.right" timestamp="1592401834961">
+    <state width="1876" height="325" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1593352015657" />
+    <state width="1876" height="325" key="GridCell.Tab.0.right" timestamp="1593352015657">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="169" key="GridCell.Tab.0.right/0.0.1600.860@0.0.1600.860" timestamp="1590221823327" />
-    <state width="1876" height="313" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1592401834961" />
-    <state width="1876" height="450" key="GridCell.Tab.1.bottom" timestamp="1592300286234">
+    <state width="1876" height="325" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1593352015657" />
+    <state width="1876" height="578" key="GridCell.Tab.1.bottom" timestamp="1592632430843">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.bottom/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="450" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286234" />
-    <state width="1876" height="450" key="GridCell.Tab.1.center" timestamp="1592300286234">
+    <state width="1876" height="578" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1592632430843" />
+    <state width="1876" height="578" key="GridCell.Tab.1.center" timestamp="1592632430843">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.center/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="450" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286234" />
-    <state width="1876" height="450" key="GridCell.Tab.1.left" timestamp="1592300286233">
+    <state width="1876" height="578" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1592632430843" />
+    <state width="1876" height="578" key="GridCell.Tab.1.left" timestamp="1592632430843">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.left/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="450" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286233" />
-    <state width="1876" height="450" key="GridCell.Tab.1.right" timestamp="1592300286234">
+    <state width="1876" height="578" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1592632430843" />
+    <state width="1876" height="578" key="GridCell.Tab.1.right" timestamp="1592632430843">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1557" height="238" key="GridCell.Tab.1.right/0.0.1600.860@0.0.1600.860" timestamp="1589800512801" />
-    <state width="1876" height="450" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1592300286234" />
-    <state x="521" y="12" width="998" height="708" key="SettingsEditor" timestamp="1592298407387">
+    <state width="1876" height="578" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1592632430843" />
+    <state x="521" y="12" width="998" height="708" key="SettingsEditor" timestamp="1593154048090">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="434" y="10" width="998" height="708" key="SettingsEditor/0.0.1600.860@0.0.1600.860" timestamp="1589959885700" />
-    <state x="521" y="12" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1592298407387" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1592229001542">
+    <state x="521" y="12" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1593154048090" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1592651104580">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1592229001542" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1592651104580" />
     <state x="92" y="92" width="1736" height="856" key="com.intellij.dvcs.ui.CompareBranchesDialog" timestamp="1592035513324">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -352,6 +446,8 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/midplatform$checklogin.coverage" NAME="checklogin Coverage Results" MODIFIED="1592298948093" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+    <SUITE FILE_PATH="coverage/midplatform$config.coverage" NAME="config Coverage Results" MODIFIED="1592992186984" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/midcelery" />
     <SUITE FILE_PATH="coverage/midplatform$baseconfig.coverage" NAME="baseconfig Coverage Results" MODIFIED="1592398640768" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
+    <SUITE FILE_PATH="coverage/midplatform$tokenserver.coverage" NAME="tokenserver Coverage Results" MODIFIED="1592556718633" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/common" />
   </component>
 </project>

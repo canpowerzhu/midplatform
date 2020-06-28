@@ -103,22 +103,30 @@ def ossconf(request):
 def baseConfig(request):
     if request.method == 'POST' or request.method == 'post':
         res = json.loads(request.body.decode('utf-8'))
-        models.baseConfig.objects.create(**res)
-        settings.finalData['code']=2001
-        settings.finalData['msg'] = 'success'
-        return HttpResponse(settings.finalData)
+        try:
+            models.baseConfig.objects.create(**res)
+            settings.RESULT['code'] = 2001
+            settings.RESULT['msg'] = 'success'
+        except Exception as e:
+            settings.RESULT['code'] = 2006
+            settings.RESULT['msg'] = 'fail'
+            settings.RESULT['data'] = str(e)
+        return JsonResponse(settings.RESULT)
+
     if request.method == 'GET' or request.method == 'get':
         res = models.baseConfig.objects.all().values()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
+        settings.RESULT['count'] = res.count()
         settings.RESULT['data'] = list(res)
         return JsonResponse(settings.RESULT)
+
     if request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
-        models.sys_role.objects.filter(pk=res['id']).update(**res)
+        models.baseConfig.objects.filter(pk=res['id']).update(**res)
         settings.finalData['code'] = 2001
         settings.finalData['msg'] = 'success'
-        return HttpResponse(settings.finalData)
+        return JsonResponse(settings.finalData)
 
 
 
@@ -137,10 +145,7 @@ def changemailserver(request):
     return HttpResponse('success')
 
 
-def test(request):
-    from common import baseconfig
-    res = baseconfig.getconfig()
-    return JsonResponse(res)
+
 
 
 
@@ -231,14 +236,15 @@ def sysuser(request):
 
     elif request.method == 'POST' or request.method == 'post':
         sysUserDict = json.loads(request.body.decode('utf-8'))
-        if sysUserDict['avatar'] != None:
-            avatarPath = ossupload.uploadBase64Pic(sysUserDict['avatar'])
-            if avatarPath != None:
-                sysUserDict['avatar'] = avatarPath
-            else:
-                settings.RESULT['code'] = 2002
-                settings.RESULT['msg'] = 'fail'
-                return JsonResponse(settings.RESULT)
+        if 'avatar'  in sysUserDict:
+            if sysUserDict['avatar'] != None:
+                avatarPath = ossupload.uploadBase64Pic(sysUserDict['avatar'])
+                if avatarPath != None:
+                    sysUserDict['avatar'] = avatarPath
+                else:
+                    settings.RESULT['code'] = 2002
+                    settings.RESULT['msg'] = 'fail'
+                    return JsonResponse(settings.RESULT)
         print(sysUserDict)
         models.sys_user.objects.create(**sysUserDict)
         settings.RESULT['code'] = 2001

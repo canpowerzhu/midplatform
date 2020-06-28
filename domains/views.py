@@ -8,6 +8,7 @@ from aliyunsdkcore.client import AcsClient
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
 from django.core.paginator import Paginator
+
 #### 域名接口
 s = requests.session()
 
@@ -41,7 +42,6 @@ def accountlist(request):
     pageData = paginator.page(page)
     if len(pageData) > 0:
         datalist = list(pageData)
-
 
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -96,89 +96,6 @@ def domaininfo(request):
     return HttpResponse("fail")
 
 
-def domainsync(request):
-    """
-    同步各个账户的域名列表接口
-    http://127.0.0.1:88/domains/domainsync/?account=adam.king
-    """
-    from common import baseconfig
-    api_url = baseconfig.getconfig()['nameDomainApi']
-    api_url = baseconfig.getconfig()['nameDomainApi']
-    account = request.GET.get('account')
-    res = models.Domainaccount.objects.filter(username=account).first()
-    token = res.token.strip()
-    result = {}
-    result['username'] = account
-    result['token'] = token
-    ## 使用JsonResponse 返回字典，直接响应json
-
-    s.auth = (account, token)
-    res = s.get(url=api_url)
-    if res.status_code == 200:
-        domainresult = res.content.decode('utf-8')
-        if 'domains' in domainresult:
-            data = json.loads(domainresult)['domains']
-            ###利用bulk_create进行批量插入
-            domain_obj_list = []
-            for i in range(len(data)):
-                print(">>>>>> %s" % data[i]['domainName'])
-                recordinfo(s, api_url, data[i]['domainName'], account)
-
-                if 'autorenewEnabled' not in data[i]:
-                    # if 	data[i].has_key('autorenewEnabled'): ###python3 已经删除了has_key方法
-                    data[i]['autorenewEnabled'] = False
-                if 'locked' not in data[i]:
-                    data[i]['locked'] = False
-                domain_obj_list.append(
-                    models.Domainlist(name_account=account,
-                                      domainName=data[i]['domainName'],
-                                      locked=data[i]['locked'],
-                                      autorenewEnabled=data[i]['autorenewEnabled'],
-                                      expireDate=data[i]['expireDate'].split('T')[0],
-                                      createDate=data[i]['createDate'].split('T')[0])
-                )
-        else:
-            result['msg'] = 'no domain'
-            return JsonResponse(result)
-        models.Domainlist.objects.filter(name_account=account).delete()
-        models.Domainlist.objects.bulk_create(domain_obj_list)
-        result['data'] = data
-    else:
-        print("request failed")
-    return JsonResponse(result)
-
-
-def recordinfo(s, api_url, domian, username):
-    """
-    内部使用的同步二级域名至数据库
-    """
-    # record_api_url = 'https://api.name.com/v4/domains/ztianr.com/records'
-    record_obj_list = []
-    record_api_url = api_url + '/' + domian + '/records'
-    # username = 'peterlin.zhou'
-    # token = 'd07d86b09c8b9587414f9b909480aa1e4456b981'
-    # s.auth = (username, token)
-    record_res = s.get(url=record_api_url)
-    if record_res.status_code == 200:
-        result = record_res.content.decode('utf-8')
-        result = json.loads(result)
-        if result:
-            for i in range(len(result['records'])):
-                print(result['records'][i])
-                record_obj_list.append(
-                    models.Domaininfo(name_account=username,
-                                      register_website='www.name.com',
-                                      domain_name=result['records'][i]['domainName'],
-                                      fqdn=result['records'][i]['fqdn'],
-                                      type=result['records'][i]['type'],
-                                      answer=result['records'][i]['answer']
-                                      )
-                )
-            models.Domaininfo.objects.filter(domain_name=result['records'][i]['domainName']).delete()
-            models.Domaininfo.objects.bulk_create(record_obj_list)
-    return HttpResponse('ok')
-
-
 def modifydomianinfo(request):
     """
     修改二级域名的所属项目以及备注
@@ -231,23 +148,108 @@ def modifyaccount(request):
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
         print(res, type(res))
-        id = int(res['account_id'])
+        id = int(res['id'])
         if res['status']:
             status = '1'
         else:
             status = '0'
-
         is_ok = models.Domainaccount.objects.filter(pk=id).update(status=status)
-        front_respone = {'code': 2001, 'msg': None}
-
         if is_ok == 1:
-            front_respone['msg'] = 'success'
+            settings.RESULT['code'] = 2001
+            settings.RESULT['msg'] = 'success'
         else:
-            front_respone['code'] = 2002
-            front_respone['msg'] = 'fail'
+            settings.RESULT['code'] = 2002
+            settings.RESULT['msg'] = 'fail'
+        return JsonResponse(settings.RESULT)
 
-        return JsonResponse(front_respone)
 
+
+
+
+####name域名相关同步
+def domainsync(request):
+    """
+    同步各个账户的域名列表接口
+    http://127.0.0.1:88/domains/domainsync/?account=adam.king
+    """
+    from common import baseconfig
+    api_url = baseconfig.getconfig()['nameDomainApi']
+    account = request.GET.get('account')
+    res = models.Domainaccount.objects.filter(username=account).first()
+    token = res.token.strip()
+    result = {}
+
+    s.auth = (account, token)
+    res = s.get(url=api_url)
+    if res.status_code == 200:
+        domainresult = res.content.decode('utf-8')
+        if 'domains' in domainresult:
+            data = json.loads(domainresult)['domains']
+            ###利用bulk_create进行批量插入
+            domain_obj_list = []
+            for i in range(len(data)):
+                recordinfo(s, api_url, data[i]['domainName'], account)
+                if 'autorenewEnabled' not in data[i]:
+                    # if 	data[i].has_key('autorenewEnabled'): ###python3 已经删除了has_key方法
+                    data[i]['autorenewEnabled'] = False
+                if 'locked' not in data[i]:
+                    data[i]['locked'] = False
+                domain_obj_list.append(
+                    models.Domainlist(name_account=account,
+                                      domainName=data[i]['domainName'],
+                                      locked=data[i]['locked'],
+                                      autorenewEnabled=data[i]['autorenewEnabled'],
+                                      expireDate=data[i]['expireDate'].split('T')[0],
+                                      createDate=data[i]['createDate'].split('T')[0])
+                )
+        else:
+            settings.RESULT['code'] = 2008
+            settings.RESULT['msg'] = 'fail'
+            settings.RESULT['data'] = settings.codeMsg['2008']
+            return JsonResponse(settings.RESULT)
+        print('这里是主域名相关列表%s' %domain_obj_list)
+        models.Domainlist.objects.filter(name_account=account).delete()
+        models.Domainlist.objects.bulk_create(domain_obj_list)
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'successs'
+    else:
+        settings.RESULT['code'] = 2007
+        settings.RESULT['msg'] = 'fail'
+        settings.RESULT['data'] = settings.codeMsg['2007']
+    return JsonResponse(settings.RESULT)
+
+
+def recordinfo(s, api_url, domian, username):
+    """
+    内部使用的同步二级域名至数据库
+    """
+    # record_api_url = 'https://api.name.com/v4/domains/ztianr.com/records'
+    record_obj_list = []
+    record_api_url = api_url + '/' + domian + '/records'
+
+    record_res = s.get(url=record_api_url)
+    if record_res.status_code == 200:
+        result = record_res.content.decode('utf-8')
+        result = json.loads(result)
+        if result:
+            for i in range(len(result['records'])):
+                record_obj_list.append(
+                    models.Domaininfo(name_account=username,
+                                      register_website='www.name.com',
+                                      domain_name=result['records'][i]['domainName'],
+                                      fqdn=result['records'][i]['fqdn'],
+                                      type=result['records'][i]['type'],
+                                      answer=result['records'][i]['answer']
+                                      )
+                )
+            models.Domaininfo.objects.filter(domain_name=result['records'][i]['domainName']).delete()
+            print('这里是%s域名相关列表%s' %(domian , record_obj_list))
+            models.Domaininfo.objects.bulk_create(record_obj_list)
+
+    return HttpResponse('ok')
+
+
+#### 阿里云域名相关同步
 
 def aliyundomainsync(request):
     """
