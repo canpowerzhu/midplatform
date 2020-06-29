@@ -10,9 +10,6 @@ from django.core.paginator import Paginator
 import datetime
 
 
-
-
-
 ##发布记录包含四个接口： addrecord、editrecord、getallrecord
 #
 #
@@ -20,18 +17,11 @@ def getallrecord(request):
     limit = int(request.GET.get('limit', default=10))
     page = int(request.GET.get('page', default=1))
 
-    # if page == 1:
-    #     start = 0
-    #     stop = limit
-    # else:
-    #     start = (page - 1) * limit
-    #     stop = limit * page
-
     projectName = request.GET.get('projectName')
     publisher = request.GET.get('publisher')
 
     kwargs = {
-    # 动态查询的字段
+        # 动态查询的字段
     }
     if publisher != None and projectName != None:
         kwargs['publisher'] = publisher
@@ -40,7 +30,7 @@ def getallrecord(request):
     elif projectName != None:
         kwargs['ProjectName'] = projectName
 
-    elif publisher != None :
+    elif publisher != None:
         kwargs['Publisher'] = publisher
     else:
         count = models.deployRecord.objects.filter(**kwargs).count()
@@ -72,9 +62,9 @@ def addrecord(request):
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
         print(res)
-        #TODO 没有缓存上传为0 需要判断
-        #{'isModifyCache': 0, 'isModifySql': 0, 'projectName': '21212121', 'state': 0, 'isRollBack': 1, 'publisher': 'dixiaoping', 'modifyContent': '11212211221', 'modifyModel': '21233232122112'}
-        kwargs ={
+        # TODO 没有缓存上传为0 需要判断
+        # {'isModifyCache': 0, 'isModifySql': 0, 'projectName': '21212121', 'state': 0, 'isRollBack': 1, 'publisher': 'dixiaoping', 'modifyContent': '11212211221', 'modifyModel': '21233232122112'}
+        kwargs = {
             ##动态参数
         }
         if res['isModifyCache'] == 1:
@@ -85,13 +75,12 @@ def addrecord(request):
             kwargs['isModifySql'] = 1
             kwargs['sqlDetail'] = res['sqlDetail']
 
-        kwargs['projectName'] =res['projectName']
-        kwargs['isRollBack'] =res['isRollBack']
-        kwargs['modifyModel'] =res['modifyModel']
-        kwargs['modifyContent'] =res['modifyContent']
+        kwargs['projectName'] = res['projectName']
+        kwargs['isRollBack'] = res['isRollBack']
+        kwargs['modifyModel'] = res['modifyModel']
+        kwargs['modifyContent'] = res['modifyContent']
         kwargs['state'] = 0
-        kwargs['publisher'] =res['publisher']
-
+        kwargs['publisher'] = res['publisher']
 
         models.deployRecord.objects.create(**kwargs)
         front_respone = {'code': 2001, 'msg': None}
@@ -124,8 +113,10 @@ def dingtalkmsg(data, type):
     # from project.models import ProjectName
     headers = {'Content-Type': 'application/json;charset=utf-8'}
     print(data)
-    logo = models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()['projectLogo']
-    projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()['projectHook']
+    logo = models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()[
+        'projectLogo']
+    projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()[
+        'projectHook']
     api_url = "https://oapi.dingtalk.com/robot/send?access_token=" + projecthook
     print(logo)
     if type == 0:
@@ -195,5 +186,3 @@ def proTime(res):
     firetime = (stop_time - start_time) / 60
 
     return int(firetime)
-
-

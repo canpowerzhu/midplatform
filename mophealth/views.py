@@ -35,29 +35,13 @@ def tasklist(request):
 
     return JsonResponse(settings.RESULT)
 
-def test(request):
-    from midcelery.gettask.tasks import getUrl
-    # 异步任务
-    # send_sms.delay('119')
-    # send_sms2.delay('110')
-
-    # 定时任务
-    import datetime
-    from datetime import timedelta
-    ##获取间隔时间
-    delayTime = int(request.GET.get('intervalTime'))
-    utc_ctime = datetime.datetime.utcfromtimestamp(datetime.datetime.now().timestamp())
-    task_time = utc_ctime + timedelta(seconds=delayTime)
-    url = 'http://bus.dominoppo.in/domino-webapi/rest/actuator/health'
-    result = getUrl.apply_async([url,], eta=task_time)
-    print(result)
-    return JsonResponse({'code':'200','id':result.id})
 
 
-def test2(request):
+
+def taskStatus(request):
     from mophealth import midscheduler
     taskid = request.GET.get('taskid')
-    opstype = int(request.GET.get('type',default=0))
+    opstype = int(request.GET.get('opstype',default=0))
     taskinfo = list(models.taskList.objects.filter(pk=int(taskid)).values_list('taskUrl','taskRate').first())
     print(len(taskinfo),taskinfo)
     taskUrl = taskinfo[0]

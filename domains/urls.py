@@ -12,6 +12,6 @@ urlpatterns = [
     url(r'^modifydomianinfo/', views.modifydomianinfo),
     url(r'^domainlist/', views.domainlist),
     url(r'^modifyaccount/', views.modifyaccount),
-    url(r'^aliyundomainsync/', views.aliyundomainsync),
-    url(r'^aliyunDomainRecord/', views.aliyunDomainRecord),
+    # url(r'^aliyundomainsync/', views.aliyundomainsync),
+    # url(r'^aliyunDomainRecord/', views.aliyunDomainRecord),
 ]

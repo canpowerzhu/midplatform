@@ -102,8 +102,6 @@ def run(taskid,url,intervalTime,opstype):
     if opstype == 3:
         res = scheduler.resume_job(taskid)
 
-    if opstype == 4:
-        res = scheduler.get_job(taskid)
 
     print(res)
     #程序开始

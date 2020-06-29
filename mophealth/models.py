@@ -24,7 +24,7 @@ class taskList(models.Model):
     responseTime = models.IntegerField( verbose_name='响应时间')
     thresholdCount = models.IntegerField(default=3, verbose_name="连续几次超过阈值后报警")
     deleted = models.IntegerField(default=1, verbose_name='0 删除，1 正常')
-    disabled = models.IntegerField(default=1, verbose_name='0 禁用，1 启用')
+    disabled = models.IntegerField(default=0, verbose_name='0 禁用，1 启用')
     createTime = models.DateTimeField(auto_now=True, verbose_name='创建时间')
     updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 

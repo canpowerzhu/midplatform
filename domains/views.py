@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.http import HttpResponse, JsonResponse
-from django.conf import settings
+# from django.conf import settings
+from midplatform import  settings
 from domains import models
 import json
 import requests, request
@@ -174,11 +175,22 @@ def domainsync(request):
     """
     from common import baseconfig
     api_url = baseconfig.getconfig()['nameDomainApi']
-    account = request.GET.get('account')
-    res = models.Domainaccount.objects.filter(username=account).first()
-    token = res.token.strip()
-    result = {}
+    id = request.GET.get('id')
+    registerType = list(models.Domainaccount.objects.filter(pk=id).values_list('register_website',flat=True))[0]
+    print(registerType)
+    if registerType == 'www.aliyun.com':
+        if aliyundomainsync(id):
+            settings.RESULT['code'] = 2001
+            settings.RESULT['msg'] = 'successs'
+            settings.RESULT['data'] = settings.codeMsg[2001]
+            return JsonResponse(settings.RESULT)
 
+
+
+    account_token = list(models.Domainaccount.objects.filter(pk=id).values_list('username','token').first())
+    account = account_token[0]
+    token = account_token[1]
+    print(account_token)
     s.auth = (account, token)
     res = s.get(url=api_url)
     if res.status_code == 200:
@@ -207,15 +219,16 @@ def domainsync(request):
             settings.RESULT['msg'] = 'fail'
             settings.RESULT['data'] = settings.codeMsg['2008']
             return JsonResponse(settings.RESULT)
-        print('这里是主域名相关列表%s' %domain_obj_list)
+
         models.Domainlist.objects.filter(name_account=account).delete()
         models.Domainlist.objects.bulk_create(domain_obj_list)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'successs'
+        settings.RESULT['data'] = settings.codeMsg[2001]
     else:
         settings.RESULT['code'] = 2007
         settings.RESULT['msg'] = 'fail'
-        settings.RESULT['data'] = settings.codeMsg['2007']
+        settings.RESULT['data'] = settings.codeMsg[2007]
     return JsonResponse(settings.RESULT)
 
 
@@ -251,14 +264,11 @@ def recordinfo(s, api_url, domian, username):
 
 #### 阿里云域名相关同步
 
-def aliyundomainsync(request):
-    """
-    阿里云的万网域名接口
-    get 请求 参数account
-    """
-    username = request.GET.get('account')
-    accessKeyId = models.Domainaccount.objects.get(username=username).token_name
-    accessSecret = models.Domainaccount.objects.get(username=username).account_code
+def aliyundomainsync(id):
+    resdata = list(models.Domainaccount.objects.filter(pk=id).values_list('token_name', 'account_code','username').first())
+    accessKeyId = resdata[0]
+    accessSecret = resdata[1]
+    username = resdata[2]
     client = AcsClient(accessKeyId, accessSecret, 'cn-hangzhou')
 
     request = QueryDomainListRequest()
@@ -283,7 +293,7 @@ def aliyundomainsync(request):
         ))
     models.Domainlist.objects.filter(name_account=username).delete()
     models.Domainlist.objects.bulk_create(domainlist)
-    return HttpResponse('ok')
+    return True
 
 
 def aliyunDomainRecord(domain, client, username):
@@ -292,14 +302,12 @@ def aliyunDomainRecord(domain, client, username):
     """
     request = DescribeDomainRecordsRequest()
     request.set_accept_format('json')
-
     request.set_DomainName(domain)
 
     response = client.do_action_with_exception(request).decode('utf-8')
     records = json.loads(response)['DomainRecords']['Record']
     domaininfolist = []
     if len(records) > 0:
-
         for i in range(len(records)):
             domaininfolist.append(models.Domaininfo(
                 register_website='www.aliyun.com',
@@ -309,6 +317,5 @@ def aliyunDomainRecord(domain, client, username):
                 type=records[i]['Type'],
                 answer=records[i]['Value']
             ))
-        print(domaininfolist)
         models.Domaininfo.objects.filter(name_account=username, domain_name=records[i]['DomainName']).delete()
         models.Domaininfo.objects.bulk_create(domaininfolist)
