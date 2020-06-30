@@ -371,6 +371,7 @@ def sysuserlogin(request):
         return JsonResponse({'code': 2003, 'msg': 'fail', 'data': '用户不存在'})
 
     dbPassword = model_to_dict(models.sys_user.objects.filter(username=param_dict['username']).first())['password']
+    print(dbPassword,originPassword)
     if originPassword == dbPassword:
         info =model_to_dict(models.sys_user.objects.get(username=param_dict['username']))
         info['password'] = Aescrypt(info['password'],0)['jiami']
@@ -379,12 +380,12 @@ def sysuserlogin(request):
         user_role_id= model_to_dict(models.sys_user_role.objects.filter(user_id=int(info['id'])).first())['role_id']
 
         user_persssions_id = list(models.sys_role_menu.objects.filter(role_id=user_role_id).values_list('permission_id',flat=True))
-        print(user_persssions_id, type(user_persssions_id))
+
         ###查询当前用户的角色 ROLE_DEV ROLE_ADMIN 等等
         roles = models.sys_role.objects.filter(id=user_role_id).values_list('code',flat=True)
 
         permissions = models.sys_menu.objects.filter(id__in=user_persssions_id).values_list('code',flat=True)
-        print(models.sys_menu.objects.filter(id__in=user_persssions_id).values('code'))
+
         from common import tokenserver
         access_token = tokenserver.create_token(param_dict['username'])
         settings.loginDic['access_token'] =access_token

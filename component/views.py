@@ -68,3 +68,6 @@ def upload(request):
                                           url=str(url))
             finaldata = {'code': 2001, 'msg': 'success'}
     return JsonResponse(finaldata)
+
+
+

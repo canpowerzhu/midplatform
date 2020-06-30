@@ -177,7 +177,6 @@ def domainsync(request):
     api_url = baseconfig.getconfig()['nameDomainApi']
     id = request.GET.get('id')
     registerType = list(models.Domainaccount.objects.filter(pk=id).values_list('register_website',flat=True))[0]
-    print(registerType)
     if registerType == 'www.aliyun.com':
         if aliyundomainsync(id):
             settings.RESULT['code'] = 2001
@@ -256,7 +255,6 @@ def recordinfo(s, api_url, domian, username):
                                       )
                 )
             models.Domaininfo.objects.filter(domain_name=result['records'][i]['domainName']).delete()
-            print('这里是%s域名相关列表%s' %(domian , record_obj_list))
             models.Domaininfo.objects.bulk_create(record_obj_list)
 
     return HttpResponse('ok')

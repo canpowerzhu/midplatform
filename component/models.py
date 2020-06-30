@@ -22,3 +22,7 @@ class apklist(models.Model):
 
     class Meta:
         unique_together = ('packageName', 'version','envType')
+
+
+
+
