@@ -212,16 +212,15 @@ def sysuser(request):
 
 
     elif request.method == 'DELETE' or request.method == 'delete':
-
-        res = int(request.GET.get('id'))
-        models.sys_user.objects.filter(pk=res['id']).update(deleted=1)
+        id = int(request.get_full_path().split('?')[1].split('=')[1])
+        models.sys_user.objects.filter(pk=id).update(deleted=1)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
 
 
     elif request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
-        if 'avatar' in res.keys():
+        if 'avatar' in res.keys() and res['avatar'] != None:
             if res['avatar'].split('/')[0] != 'midplatform':
                 avatarPath = ossupload.uploadBase64Pic(res['avatar'])
                 if avatarPath != None:
