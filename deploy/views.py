@@ -110,11 +110,13 @@ def dingtalkmsg(data, type):
     :return:
     """
     from project import models
-    # from project.models import ProjectName
+    from common import baseconfig
+    import  os.path
+    ossurl = baseconfig.getconfig()['baseFileUrl']
     headers = {'Content-Type': 'application/json;charset=utf-8'}
-    print(data)
-    logo = models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()[
+    logo = ossurl + models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()[
         'projectLogo']
+
     projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()[
         'projectHook']
     api_url = "https://oapi.dingtalk.com/robot/send?access_token=" + projecthook
@@ -174,7 +176,7 @@ def dingtalkmsg(data, type):
     else:
         pass
 
-    requests.post(url=api_url, data=json.dumps(data), headers=headers)
+    # requests.post(url=api_url, data=json.dumps(data), headers=headers)
 
 
 ##计算发布时长函数
