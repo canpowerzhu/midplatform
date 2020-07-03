@@ -19,7 +19,12 @@ def getrouter(request):
     """
     auth = request.META.get('HTTP_AUTHORIZATION')
     from common import tokenserver
-    username = tokenserver.get_token(auth)['username']
+    try:
+        username = tokenserver.get_token(auth)['username']
+    except Exception as e:
+        settings.RESULT['code'] = 20032
+        settings.RESULT['msg'] = str(e)
+        return JsonResponse(settings.RESULT)
     user_id = models.sys_user.objects.filter(username=username).values('id').first()['id']
     roleid = models.sys_user_role.objects.filter(user_id=int(user_id)).values('role_id').first()['role_id']
     rolemenu = models.sys_role_menu.objects.filter(role_id=int(roleid)).values_list('permission_id',flat=True)
@@ -213,7 +218,9 @@ def sysuser(request):
 
     elif request.method == 'DELETE' or request.method == 'delete':
         id = int(request.get_full_path().split('?')[1].split('=')[1])
-        models.sys_user.objects.filter(pk=id).update(deleted=1)
+        import datetime
+        deltime = datetime.datetime.now().strftime('%b-%d-%y %H:%M:%S')
+        models.sys_user.objects.filter(pk=id).update(deleted=deltime)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
 
@@ -244,10 +251,15 @@ def sysuser(request):
                     settings.RESULT['code'] = 2002
                     settings.RESULT['msg'] = 'fail'
                     return JsonResponse(settings.RESULT)
-        print(sysUserDict)
-        models.sys_user.objects.create(**sysUserDict)
-        settings.RESULT['code'] = 2001
-        settings.RESULT['msg'] = 'success'
+        try:
+            models.sys_user.objects.create(**sysUserDict)
+            settings.RESULT['code'] = 2001
+            settings.RESULT['msg'] = 'success'
+        except Exception as e:
+            settings.RESULT['code'] = 2009
+            settings.RESULT['msg'] = '用户已存在'
+            settings.RESULT['data'] = str(e)
+
     return JsonResponse(settings.RESULT)
 
 
@@ -347,7 +359,8 @@ def sysRole(request):
             ###编辑角色，必须带有ID
             models.sys_role.objects.filter(pk=res['id']).update(**kwargs)
         if request.method == 'DELETE' or request.method == 'delete':
-            models.sys_role.objects.update(deleted=1)
+            id = int(request.get_full_path().split('?')[1].split('=')[1])
+            models.sys_role.objects.filter(id=id).update(deleted=1)
 
 
     except:

@@ -64,10 +64,7 @@ class sys_user(models.Model):
         (0, 'normal'),
         (1, 'locked'),
     )
-    DEL_CHOICES = (
-        (0, 'normal'),
-        (1, 'deleted'),
-    )
+
     username = models.CharField(unique=True,null=True,max_length=100, verbose_name='用户名')
     nickname = models.CharField(null=True,max_length=100, verbose_name='显示名称')
     password = fields.EncryptedCharField(null=True,max_length=500, verbose_name='显示名称')
@@ -78,9 +75,12 @@ class sys_user(models.Model):
     email = models.CharField(null=True,max_length=100, verbose_name='电子邮箱')
     phone = models.CharField(null=True,max_length=100, verbose_name='电话')
     status = models.IntegerField(db_index=True, choices=LOCK_CHOICES, verbose_name='用户状态，锁定 正常')
-    deleted = models.IntegerField(default=0,db_index=True,choices=DEL_CHOICES, verbose_name='删除状态，锁定 正常')
+    deleted = models.CharField(max_length=200, default=0,db_index=True,verbose_name='删除状态，锁定 正常')
     createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+
+    class Meta:
+        unique_together = ('username', 'deleted',)
 
 
 class sys_role(models.Model):
