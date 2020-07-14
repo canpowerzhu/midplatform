@@ -57,6 +57,7 @@ def modifybaseinfo(request):
         try:
             models.projectName.objects.filter(pk=data['id']).update(projectName=data['projectName'],
                                                                     projectModel=data['projectModel'],
+                                                                    projectHook=data['projectHook'],
                                                                     status=data['status'],
                                                                     updateTime=datetime.datetime.now(),
                                                                     projectLogo=data['projectLogo'])

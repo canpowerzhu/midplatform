@@ -5,9 +5,10 @@ from django.forms.models import model_to_dict
 import json
 from django.core.paginator import Paginator
 from django.db.models import Q
-from common import ossupload,midplatformcrypt,tokenserver
+from common import ossupload, midplatformcrypt, tokenserver
 
-isLogin=tokenserver.isLogin
+isLogin = tokenserver.isLogin
+
 
 ##路由配置
 # @tokenserver.isLogin
@@ -27,14 +28,15 @@ def getrouter(request):
         return JsonResponse(settings.RESULT)
     user_id = models.sys_user.objects.filter(username=username).values('id').first()['id']
     roleid = models.sys_user_role.objects.filter(user_id=int(user_id)).values('role_id').first()['role_id']
-    rolemenu = models.sys_role_menu.objects.filter(role_id=int(roleid)).values_list('permission_id',flat=True)
+    rolemenu = models.sys_role_menu.objects.filter(role_id=int(roleid)).values_list('permission_id', flat=True)
     rolemenuList = list(rolemenu)
     if request.method == 'GET' or request.method == 'get':
-        router = models.sys_menu.objects.filter(id__in=rolemenuList).filter(deleted=1).filter(~Q(type=2)).values('component', 'hidden', 'icon',
-                                                                                     'sort', 'id', 'KeepAlive',
-                                                                                     'parentId', 'path', 'redirect',
-                                                                                     'routerName', 'target', 'title',
-                                                                                     'type', 'code')
+        router = models.sys_menu.objects.filter(id__in=rolemenuList).filter(deleted=1).filter(~Q(type=2)).values(
+            'component', 'hidden', 'icon',
+            'sort', 'id', 'KeepAlive',
+            'parentId', 'path', 'redirect',
+            'routerName', 'target', 'title',
+            'type', 'code')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -61,8 +63,8 @@ def router(request):
 
     elif request.method == 'DELETE' or request.method == 'delete':
 
-        res = int(request.GET.get('id'))
-        models.sys_menu.objects.filter(pk=res['id']).update(deleted=1)
+        id = int(request.get_full_path().split('?')[1].split('=')[1])
+        models.sys_menu.objects.filter(pk=id).update(deleted=0)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         # return JsonResponse(settings.RESULT)
@@ -99,11 +101,12 @@ def ossconf(request):
     if request.method == 'POST' or request.method == 'post':
         import json
         res = json.loads(request.body.decode('utf-8'))
-        models.ossconf.objects.update_or_create(id=res['id'],defaults=res)
+        models.ossconf.objects.update_or_create(id=res['id'], defaults=res)
 
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
     return JsonResponse(settings.RESULT)
+
 
 def baseConfig(request):
     if request.method == 'POST' or request.method == 'post':
@@ -134,9 +137,6 @@ def baseConfig(request):
         return JsonResponse(settings.finalData)
 
 
-
-
-
 ## 邮件配置相关
 def mailserver(request):
     pass
@@ -150,14 +150,10 @@ def changemailserver(request):
     return HttpResponse('success')
 
 
-
-
-
-
 def Aescrypt(reqsecret, type):
     back_data = {}
-    passKey=models.baseConfig.objects.filter(confKey='passKey').values('confValue').first()['confValue']
-    passOffset=models.baseConfig.objects.filter(confKey='passOffset').values('confValue').first()['confValue']
+    passKey = models.baseConfig.objects.filter(confKey='passKey').values('confValue').first()['confValue']
+    passOffset = models.baseConfig.objects.filter(confKey='passOffset').values('confValue').first()['confValue']
 
     ###这里初始化加密对象 传入key 初始化密钥, 以及对应的偏移量
     text = midplatformcrypt.midowncrppt(passKey, passOffset)
@@ -215,17 +211,18 @@ def sysuser(request):
             settings.RESULT['msg'] = 'success'
             settings.RESULT['data'] = records
 
+        return JsonResponse(settings.RESULT)
 
-    elif request.method == 'DELETE' or request.method == 'delete':
+    if request.method == 'DELETE' or request.method == 'delete':
         id = int(request.get_full_path().split('?')[1].split('=')[1])
         import datetime
         deltime = datetime.datetime.now().strftime('%b-%d-%y %H:%M:%S')
         models.sys_user.objects.filter(pk=id).update(deleted=deltime)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
+        return JsonResponse(settings.RESULT)
 
-
-    elif request.method == 'PUT' or request.method == 'put':
+    if request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
         if 'avatar' in res.keys() and res['avatar'] != None:
             if res['avatar'].split('/')[0] != 'midplatform':
@@ -239,10 +236,12 @@ def sysuser(request):
         models.sys_user.objects.filter(pk=res['id']).update(**res)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
+        print(settings.RESULT)
+        return JsonResponse(settings.RESULT)
 
-    elif request.method == 'POST' or request.method == 'post':
+    if request.method == 'POST' or request.method == 'post':
         sysUserDict = json.loads(request.body.decode('utf-8'))
-        if 'avatar'  in sysUserDict:
+        if 'avatar' in sysUserDict:
             if sysUserDict['avatar'] != None:
                 avatarPath = ossupload.uploadBase64Pic(sysUserDict['avatar'])
                 if avatarPath != None:
@@ -260,7 +259,7 @@ def sysuser(request):
             settings.RESULT['msg'] = '用户已存在'
             settings.RESULT['data'] = str(e)
 
-    return JsonResponse(settings.RESULT)
+        return JsonResponse(settings.RESULT)
 
 
 ###系统用户授权
@@ -370,7 +369,6 @@ def sysRole(request):
 
 
 def sysuserlogin(request):
-
     param_dict = {}
     if request.method == 'POST' or request.method == 'post':
         query_param = request.get_full_path().split('?')[1]
@@ -383,32 +381,32 @@ def sysuserlogin(request):
         return JsonResponse({'code': 2003, 'msg': 'fail', 'data': '用户不存在'})
 
     dbPassword = model_to_dict(models.sys_user.objects.filter(username=param_dict['username']).first())['password']
-    print(dbPassword,originPassword)
+    print(dbPassword, originPassword)
     if originPassword == dbPassword:
-        info =model_to_dict(models.sys_user.objects.get(username=param_dict['username']))
-        info['password'] = Aescrypt(info['password'],0)['jiami']
+        info = model_to_dict(models.sys_user.objects.get(username=param_dict['username']))
+        info['password'] = Aescrypt(info['password'], 0)['jiami']
 
         ###获取用户对应角色的权限
-        user_role_id= model_to_dict(models.sys_user_role.objects.filter(user_id=int(info['id'])).first())['role_id']
+        user_role_id = model_to_dict(models.sys_user_role.objects.filter(user_id=int(info['id'])).first())['role_id']
 
-        user_persssions_id = list(models.sys_role_menu.objects.filter(role_id=user_role_id).values_list('permission_id',flat=True))
+        user_persssions_id = list(
+            models.sys_role_menu.objects.filter(role_id=user_role_id).values_list('permission_id', flat=True))
 
         ###查询当前用户的角色 ROLE_DEV ROLE_ADMIN 等等
-        roles = models.sys_role.objects.filter(id=user_role_id).values_list('code',flat=True)
+        roles = models.sys_role.objects.filter(id=user_role_id).values_list('code', flat=True)
 
-        permissions = models.sys_menu.objects.filter(id__in=user_persssions_id).values_list('code',flat=True)
+        permissions = models.sys_menu.objects.filter(id__in=user_persssions_id).values_list('code', flat=True)
 
         from common import tokenserver
         access_token = tokenserver.create_token(param_dict['username'])
-        settings.loginDic['access_token'] =access_token
-        settings.loginDic['expires_in'] =1800
+        settings.loginDic['access_token'] = access_token
+        settings.loginDic['expires_in'] = 18000
         settings.loginDic['permissions'] = list(permissions)
         settings.loginDic['roles'] = list(roles)
         settings.loginDic['info'] = info
         # print(settings.loginDic)
-        return JsonResponse({'code': 2001, 'msg': 'success', 'data':settings.loginDic})
+        return JsonResponse({'code': 2001, 'msg': 'success', 'data': settings.loginDic})
     return JsonResponse({'code': 2004, 'msg': 'fail', 'data': '密码错误'})
-
 
 
 def codeMsg(request):
