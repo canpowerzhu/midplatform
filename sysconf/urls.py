@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^sysuserlogin/', views.sysuserlogin),
     url(r'^codeMsg/', views.codeMsg),
     url(r'^baseConfig/', views.baseConfig),
+    url(r'^deployuser/', views.deployuser),
 ]
 

@@ -88,6 +88,7 @@ def addbaseinfo(request):
                                               projectModel=res['projectModel'],
                                               status=res['status'],
                                               projectHook=res['projectHook'],
+                                              projectOwner=res['projectOwner'],
                                               projectLogo=uploadPic)
         except Exception as e:
             print(e)

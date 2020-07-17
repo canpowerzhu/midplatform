@@ -17,6 +17,7 @@ class projectName(models.Model):
     projectName = models.CharField(max_length=200, verbose_name='项目名称')
     projectHook = models.CharField(max_length=200, verbose_name='项目Hook')
     projectModel = models.CharField(max_length=500, verbose_name="项目模块")
+    projectOwner = models.CharField(max_length=500, verbose_name="项目经理")
     projectLogo = models.CharField(max_length=500, verbose_name="项目logo地址")
     status = models.IntegerField(choices=statusChoices,verbose_name="使用状态")
     updateTime = models.DateTimeField(auto_now=True, verbose_name="更新时间")
