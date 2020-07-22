@@ -28,7 +28,7 @@ def getallrecord(request):
         kwargs['projectName'] = projectName
 
     elif projectName != None:
-        kwargs['ProjectName'] = projectName
+        kwargs['projectName'] = projectName
 
     elif publisher != None:
         kwargs['Publisher'] = publisher
@@ -49,10 +49,7 @@ def getallrecord(request):
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = count
         settings.RESULT['data'] = datalist
-        # print(datalist)
     else:
-        # del settings.RESULT['count']
-        # del settings.RESULT['data']
         settings.RESULT['code'] = 2002
         settings.RESULT['msg'] = "fail"
     return JsonResponse(settings.RESULT)
@@ -61,7 +58,9 @@ def getallrecord(request):
 def addrecord(request):
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
-        print(res)
+        from sysconf import models as  sysmol
+        testname = sysmol.sys_user.objects.filter(id=res['tester']).values('nickname').first()['nickname']
+
         # TODO 没有缓存上传为0 需要判断
         # {'isModifyCache': 0, 'isModifySql': 0, 'projectName': '21212121', 'state': 0, 'isRollBack': 1, 'publisher': 'dixiaoping', 'modifyContent': '11212211221', 'modifyModel': '21233232122112'}
         kwargs = {
@@ -79,27 +78,82 @@ def addrecord(request):
         kwargs['isRollBack'] = res['isRollBack']
         kwargs['modifyModel'] = res['modifyModel']
         kwargs['modifyContent'] = res['modifyContent']
+        kwargs['tester'] = testname
         kwargs['state'] = 0
         kwargs['publisher'] = res['publisher']
 
         models.deployRecord.objects.create(**kwargs)
         front_respone = {'code': 2001, 'msg': None}
         front_respone['msg'] = 'success'
-        # dingtalkmsg(res, 0)
+        res['tester'] = testname
+        dingtalkmsg(res, 0)
         return JsonResponse(front_respone)
 
 
 def editrecord(request):
+    ###这里进行修改step状态
+    kwargs = {
+
+    }
+
     front_respone = {'code': 2001, 'msg': None}
     if request.method == 'POST':
         res = json.loads(request.body.decode('utf-8'))
+        stepinfo = int(res['status'])
     finishTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    models.deployRecord.objects.filter(pk=res['id']).update(state=res['state'], finishTime=finishTime,
-                                                            elapsedTime=proTime(res))
+    ###测试步骤
+    kwargs['step'] = int(res['step']) + 1
+    if stepinfo == 1 or stepinfo == 2:
+        kwargs['state'] = 1
+        kwargs['testStatus'] = res['status']
+        kwargs['testResult'] = res['Result']
+        if stepinfo == 1:
+            kwargs['state'] = 2
+            kwargs['finishTime'] = finishTime
+            kwargs['elapsedTime'] = proTime(res)
+    ### 审核步骤
+    if stepinfo == 3 or stepinfo == 4:
+        kwargs['state'] = 1
+        kwargs['aduitStatus'] = res['status']
+        kwargs['aduitResult'] = res['Result']
+        if stepinfo == 3:
+            kwargs['state'] = 2
+            kwargs['finishTime'] = finishTime
+            kwargs['elapsedTime'] = proTime(res)
+
+    ### 部署步骤
+    if stepinfo == 5 or stepinfo == 6:
+        kwargs['state'] = 1
+        kwargs['arrangeStatus'] = res['status']
+        kwargs['arrangeResult'] = res['Result']
+        if stepinfo == 5:
+            kwargs['state'] = 2
+            kwargs['finishTime'] = finishTime
+            kwargs['elapsedTime'] = proTime(res)
+
+    ### 发布步骤
+    if stepinfo == 7 or stepinfo == 8:
+        kwargs['state'] = 1
+        kwargs['deployStatus'] = res['status']
+        kwargs['deployResult'] = res['Result']
+        kwargs['state'] = 2
+        if stepinfo == 7:
+            kwargs['state'] = 2
+            kwargs['finishTime'] = finishTime
+            kwargs['elapsedTime'] = proTime(res)
+
+    models.deployRecord.objects.filter(pk=res['id']).update(**kwargs)
     data = model_to_dict(models.deployRecord.objects.get(pk=res['id']))
-    dingtalkmsg(data, int(res['state']))
+    print(data)
+    dingtalkmsg(data, stepinfo)
     front_respone['msg'] = 'success'
     return JsonResponse(front_respone)
+
+
+def dingrecord(request):
+    ## 此接口是用于发布记录模块 钉 功能
+    if request.method == 'POST' or request.method == 'post':
+        res = json.loads(request.body.decode('utf-8'))
 
 
 # alarm模块用于告知至dingding webhook
@@ -108,18 +162,34 @@ def dingtalkmsg(data, type):
     :param data:
     :param type: 0 - 是未处理 1 - 失败 2 - 成功
     :return:
+    https://moppowar.oss-ap-southeast-1.aliyuncs.com/midplatform/deploystatus/aduitok.png
     """
+    deploystatus = {
+        1: ["测试未通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testfail.png'],
+        2: ["测试通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testok.png'],
+        3: ["审核失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitfail.png'],
+        4: ["审核通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitok.png'],
+        5: ["部署失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangefail.png'],
+        6: ["部署成功", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangeok.png'],
+        7: ["发布失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployfail.png'],
+        8: ["发布成功", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployok.png']
+    }
     from project import models
     from common import baseconfig
     ossurl = baseconfig.getconfig()['baseFileUrl']
     headers = {'Content-Type': 'application/json;charset=utf-8'}
-    logo = ossurl + models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()[
-        'projectLogo']
-
-    projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()[
-        'projectHook']
+    logo = ossurl + models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()['projectLogo']
+    # projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()['projectHook']
+    projecthook = '75e709c1a28e4d79d3ab6643ef5923d9409af252ca6cd3ed52dc4da40b1e98fc'
     api_url = "https://oapi.dingtalk.com/robot/send?access_token=" + projecthook
-    print(logo)
+
+    ####获取该项目的项目经理用户ID
+    from project import models as proownermol
+    projectOwnerId = proownermol.projectName.objects.filter(projectName=data['projectName']).values('projectOwnerId').first()['projectOwnerId']
+    from sysconf import models as  sysmol
+    testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
+    ownerNum = sysmol.sys_user.objects.filter(id=int(projectOwnerId)).values('phone').first()['phone']
+
     if type == 0:
         newdata = {
             "msgtype": "markdown",
@@ -128,52 +198,40 @@ def dingtalkmsg(data, type):
                 "text": "### " + data['projectName'] + "更新概要\n" +
                         "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
                         "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
-                        "> #### 更新人员： \r\n" + data['publisher'] + "\n\r" +
+                        "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
+                        "> #### 测试人员： \r\n"  + "@" + testnum + "\n\r" +
                         "![screenshot](" + logo + ")\n"
             },
             "at": {
-                "isAtAll": True
+                "atMobiles": [
+                    testnum
+                ],
+                "isAtAll": False
             }
         }
         data = newdata
-    elif type == 2:
-        editdata = {
-            "msgtype": "markdown",
-            "markdown": {
-                "title": "项目发布",
-                "text": "### " + data[
-                    'projectName'] + "更新成功 \n" +
-                        "![screenshot](https://moppowar.oss-accelerate.aliyuncs.com/projectlogo/ook.jpg)\n" +
-                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
-                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
-                        "> #### 更新人员： \r\n" + data['publisher'] + "\n\r" +
-                        "![screenshot](" + logo + ")\n"
-            },
-            "at": {
-                "isAtAll": False
-            }
-        }
-        data = editdata
-    elif type == 1:
-        editdata = {
-            "msgtype": "markdown",
-            "markdown": {
-                "title": "项目发布",
-                "text": "### " + data[
-                    'projectName'] + "更新失败 \n" +
-                        "![screenshot](https://moppowar.oss-accelerate.aliyuncs.com/projectlogo/fail.jpg)\n" +
-                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
-                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
-                        "> #### 更新人员： \r\n" + data['publisher'] + "\n\r" +
-                        "![screenshot](" + logo + ")\n"
-            },
-            "at": {
-                "isAtAll": False
-            }
-        }
-        data = editdata
     else:
-        pass
+
+        editdata = {
+            "msgtype": "markdown",
+            "markdown": {
+                "title": "项目发布",
+                "text": "### " + data['projectName'] + "***" + deploystatus[int(type)][0] + "***" + "\n" +
+                        "![screenshot](" + deploystatus[int(type)][1] + ")\n" +
+                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
+                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
+                        "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
+                        "> #### 测试人员： \r\n" + data['tester'] + "@" + testnum + "\n\r" +
+                        "![screenshot](" + logo + ")\n"
+            },
+            "at": {
+                "atMobiles": [
+                    testnum
+                ],
+                "isAtAll": False
+            }
+        }
+        data = editdata
 
     requests.post(url=api_url, data=json.dumps(data), headers=headers)
 

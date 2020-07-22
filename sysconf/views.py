@@ -435,7 +435,7 @@ def deployuser(request):
         typeUser = 3
 
     typeUserList = models.sys_user_role.objects.filter(role_id=typeUser).values_list('user_id', flat=True)
-    res = models.sys_user.objects.filter(pk__in=list(typeUserList)).values('nickname', 'phone')
+    res = models.sys_user.objects.filter(pk__in=list(typeUserList)).values('id','nickname', 'phone')
     settings.RESULT['code'] =2001
     settings.RESULT['msg'] = 'success'
     settings.RESULT['data'] = list(res)

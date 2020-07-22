@@ -52,17 +52,20 @@ def modifybaseinfo(request):
     """
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
-
+        from sysconf import  models as  tempmodels
+        projectowner= tempmodels.sys_user.objects.filter(pk=int(data['projectOwner'])).values('nickname').first()['nickname']
         front_respone = {'code': 2001, 'msg': None}
         try:
             models.projectName.objects.filter(pk=data['id']).update(projectName=data['projectName'],
                                                                     projectModel=data['projectModel'],
                                                                     projectHook=data['projectHook'],
                                                                     status=data['status'],
+                                                                    projectOwner=projectowner,
+                                                                    projectOwnerId=int(data['projectOwner']),
                                                                     updateTime=datetime.datetime.now(),
                                                                     projectLogo=data['projectLogo'])
         except Exception as e:
-
+            print(e)
             front_respone['msg'] = 'fail'
         else:
             front_respone['msg'] = 'success'
@@ -89,6 +92,7 @@ def addbaseinfo(request):
                                               status=res['status'],
                                               projectHook=res['projectHook'],
                                               projectOwner=res['projectOwner'],
+                                              projectOwnerId=res['projectOwnerId'],
                                               projectLogo=uploadPic)
         except Exception as e:
             print(e)
@@ -118,8 +122,7 @@ def getmodelname(request):
     final_data = {"code": 2001, "msg": "success", "data": None}
     proname = request.GET.get('proname')
     data = {}
-    res = models.projectName.objects.values('projectModel').filter(projectName=proname).first()['projectModel'].split(
-        ',')
+    res = models.projectName.objects.values('projectModel').filter(projectName=proname).first()['projectModel'].split(',')
     for i in res:
         data[i] = i
     final_data['data'] = data
