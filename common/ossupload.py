@@ -37,7 +37,9 @@ def update_fil_file(envtype,project,filename,file):
 
 
 def uploadBase64Pic(data,projectname=''):
+    print(data)
     b64_data = data.split(';base64,')[1]
+    print(b64_data)
     logoType = data.split(';base64,')[0].split('/')[1]
     data = base64.b64decode(b64_data)
     if projectname :

@@ -426,13 +426,17 @@ def codeMsg(request):
 
 ### 用于发布模块使用的用户相关
 def deployuser(request):
-    ## 获取类型 测试人员 type=0 还是项目负责人 type=1
+    ## 获取类型 测试人员 type=0 还是项目负责人 type=1 运维 type=2
     type = int(request.GET.get('type'))
     if type == 0:
         typeUser = 2
 
     if type == 1:
         typeUser = 3
+
+
+    if type == 2:
+        typeUser = 1
 
     typeUserList = models.sys_user_role.objects.filter(role_id=typeUser).values_list('user_id', flat=True)
     res = models.sys_user.objects.filter(pk__in=list(typeUserList)).values('id','nickname', 'phone')

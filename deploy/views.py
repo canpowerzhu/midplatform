@@ -185,10 +185,12 @@ def dingtalkmsg(data, type):
 
     ####获取该项目的项目经理用户ID
     from project import models as proownermol
-    projectOwnerId = proownermol.projectName.objects.filter(projectName=data['projectName']).values('projectOwnerId').first()['projectOwnerId']
+    idList = proownermol.projectName.objects.filter(projectName=data['projectName']).values('projectOwnerId','opsOwnerId').first()
+
     from sysconf import models as  sysmol
     testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
-    ownerNum = sysmol.sys_user.objects.filter(id=int(projectOwnerId)).values('phone').first()['phone']
+    ownerNum = sysmol.sys_user.objects.filter(id=int(idList['projectOwnerId'])).values('phone').first()['phone']
+    opsNum = sysmol.sys_user.objects.filter(id=int(idList['opsOwnerId'])).values('phone').first()['phone']
 
     if type == 0:
         newdata = {
@@ -233,7 +235,7 @@ def dingtalkmsg(data, type):
         }
         data = editdata
 
-    requests.post(url=api_url, data=json.dumps(data), headers=headers)
+    # requests.post(url=api_url, data=json.dumps(data), headers=headers)
 
 
 ##计算发布时长函数

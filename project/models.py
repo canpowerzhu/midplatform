@@ -19,6 +19,8 @@ class projectName(models.Model):
     projectModel = models.CharField(max_length=500, verbose_name="项目模块")
     projectOwner = models.CharField(max_length=500, verbose_name="项目经理")
     projectOwnerId = models.CharField(max_length=500, verbose_name="项目经理用户Id")
+    opsOwner = models.CharField(blank=True,max_length=500, verbose_name="运维用户")
+    opsOwnerId = models.CharField(blank=True,max_length=500, verbose_name="运维用户Id")
     projectLogo = models.CharField(max_length=500, verbose_name="项目logo地址")
     status = models.IntegerField(choices=statusChoices,verbose_name="使用状态")
     updateTime = models.DateTimeField(auto_now=True, verbose_name="更新时间")
