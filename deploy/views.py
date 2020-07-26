@@ -286,3 +286,30 @@ def proTime(res):
     firetime = (stop_time - start_time) / 60
 
     return int(firetime)
+
+
+def issuerecord(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[-1].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+
+    res = json.loads(request.body.decode('utf-8'))
+    print(res)
+    kwargs= {'recordId':res['recordId'],'content':res['content'],'srcIP':ip,'username':res['username']}
+
+    try:
+        models.issueRecord.objects.update_or_create(id=res['id'], defaults=kwargs)
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+    except Exception as e:
+        print(e)
+        settings.RESULT['code'] = 2002
+        settings.RESULT['msg'] = 'fail'
+        settings.RESULT['data'] = str(e)
+
+
+
+
+    return  JsonResponse(settings.RESULT)

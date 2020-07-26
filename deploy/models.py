@@ -43,5 +43,11 @@ class deployRecord(models.Model):
     elapsedTime = models.IntegerField(blank=True,null=True,verbose_name="发布耗时 单位为分钟")
 
 
-
+class issueRecord(models.Model):
+    recordId = models.IntegerField(verbose_name='关联发布记录的记录ID 可点击超链接查看详情')
+    content = models.TextField(verbose_name='详细问题')
+    srcIP = models.CharField(max_length=20, verbose_name='操作IP')
+    username = models.CharField(max_length=20, verbose_name='哪位用户操作')
+    createTime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updateTime = models.DateTimeField(auto_now=True, verbose_name='更新时间')
 

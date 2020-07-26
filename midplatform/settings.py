@@ -27,8 +27,8 @@ DEBUG = True
 
 
 ###解决跨域问题
-# ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['*']
+# 此选项要打开 否则后面获取用户真实IP 无法获取
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
