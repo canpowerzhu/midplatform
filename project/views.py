@@ -40,8 +40,9 @@ def baseinfo(request):
     if request.method == 'PUT' or request.method == 'put':
         data = json.loads(request.body.decode('utf-8'))
         from sysconf import models as  tempmodels
-        projectowner = tempmodels.sys_user.objects.filter(pk=int(data['projectOwner'])).values('nickname').first()[
-            'nickname']
+        projectowner = tempmodels.sys_user.objects.filter(pk=int(data['projectOwnerId'])).values('nickname').first()['nickname']
+        opsowner = tempmodels.sys_user.objects.filter(pk=int(data['opsOwnerId'])).values('nickname').first()['nickname']
+        # print(projectowner,opsowner)
         front_respone = {'code': 2001, 'msg': None}
         try:
             models.projectName.objects.filter(pk=data['id']).update(projectName=data['projectName'],
@@ -49,12 +50,15 @@ def baseinfo(request):
                                                                     projectHook=data['projectHook'],
                                                                     status=data['status'],
                                                                     projectOwner=projectowner,
-                                                                    projectOwnerId=int(data['projectOwner']),
+                                                                    projectOwnerId=int(data['projectOwnerId']),
+                                                                    opsOwner=opsowner,
+                                                                    opsOwnerId=int(data['opsOwnerId']),
                                                                     updateTime=datetime.datetime.now(),
                                                                     projectLogo=data['projectLogo'])
         except Exception as e:
             print(e)
             front_respone['msg'] = 'fail'
+            front_respone['data'] = str(e)
         else:
             front_respone['msg'] = 'success'
         return JsonResponse(front_respone)
@@ -195,8 +199,7 @@ def getmodelname(request):
     final_data = {"code": 2001, "msg": "success", "data": None}
     proname = request.GET.get('proname')
     data = {}
-    res = models.projectName.objects.values('projectModel').filter(projectName=proname).first()['projectModel'].split(
-        ',')
+    res = models.projectName.objects.values('projectModel').filter(projectName=proname).first()['projectModel'].split(',')
     for i in res:
         data[i] = i
     final_data['data'] = data

@@ -79,7 +79,7 @@ def addrecord(request):
         kwargs['modifyModel'] = res['modifyModel']
         kwargs['modifyContent'] = res['modifyContent']
         kwargs['tester'] = testname
-        kwargs['state'] = 0
+        kwargs['state'] = 1
         kwargs['publisher'] = res['publisher']
 
         models.deployRecord.objects.create(**kwargs)
@@ -91,7 +91,7 @@ def addrecord(request):
 
 
 def editrecord(request):
-    ###这里进行修改step状态
+    # 这里进行修改step状态
     kwargs = {
 
     }
@@ -101,7 +101,7 @@ def editrecord(request):
         res = json.loads(request.body.decode('utf-8'))
         stepinfo = int(res['status'])
     finishTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-    ###测试步骤
+    # 测试步骤
     kwargs['step'] = int(res['step']) + 1
     if stepinfo == 1 or stepinfo == 2:
         kwargs['state'] = 1
@@ -111,7 +111,7 @@ def editrecord(request):
             kwargs['state'] = 2
             kwargs['finishTime'] = finishTime
             kwargs['elapsedTime'] = proTime(res)
-    ### 审核步骤
+    # 审核步骤
     if stepinfo == 3 or stepinfo == 4:
         kwargs['state'] = 1
         kwargs['aduitStatus'] = res['status']
@@ -121,7 +121,7 @@ def editrecord(request):
             kwargs['finishTime'] = finishTime
             kwargs['elapsedTime'] = proTime(res)
 
-    ### 部署步骤
+    # 部署步骤
     if stepinfo == 5 or stepinfo == 6:
         kwargs['state'] = 1
         kwargs['arrangeStatus'] = res['status']
@@ -131,13 +131,14 @@ def editrecord(request):
             kwargs['finishTime'] = finishTime
             kwargs['elapsedTime'] = proTime(res)
 
-    ### 发布步骤
+    # 发布步骤
     if stepinfo == 7 or stepinfo == 8:
         kwargs['state'] = 1
         kwargs['deployStatus'] = res['status']
         kwargs['deployResult'] = res['Result']
-        kwargs['state'] = 2
+        kwargs['state'] = 3
         if stepinfo == 7:
+            # 发布状态失败 state = 2
             kwargs['state'] = 2
             kwargs['finishTime'] = finishTime
             kwargs['elapsedTime'] = proTime(res)
@@ -151,9 +152,17 @@ def editrecord(request):
 
 
 def dingrecord(request):
-    ## 此接口是用于发布记录模块 钉 功能
+    # 此接口是用于发布记录模块 钉 功能
+    # 需要传参 针对哪个发布记录钉  钉哪一步
     if request.method == 'POST' or request.method == 'post':
         res = json.loads(request.body.decode('utf-8'))
+        dingstep = int(res['dingstep'])  # dingstep  1 测试 2 审核 3 运维
+        id = int(res['id'])
+        dingcontent =models.deployRecord.objects.filter(pk=id).values('projectName','tester').first()
+        data = {'tester': dingcontent['tester'],'dingstep': dingstep,'projectName':dingcontent['projectName']}
+        dingtalkmsg(data,9)
+        return  HttpResponse('ok')
+
 
 
 # alarm模块用于告知至dingding webhook
@@ -164,57 +173,47 @@ def dingtalkmsg(data, type):
     :return:
     https://moppowar.oss-ap-southeast-1.aliyuncs.com/midplatform/deploystatus/aduitok.png
     """
-    deploystatus = {
-        1: ["测试未通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testfail.png'],
-        2: ["测试通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testok.png'],
-        3: ["审核失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitfail.png'],
-        4: ["审核通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitok.png'],
-        5: ["部署失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangefail.png'],
-        6: ["部署成功", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangeok.png'],
-        7: ["发布失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployfail.png'],
-        8: ["发布成功", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployok.png']
-    }
     from project import models
     from common import baseconfig
     ossurl = baseconfig.getconfig()['baseFileUrl']
     headers = {'Content-Type': 'application/json;charset=utf-8'}
-    logo = ossurl + models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()['projectLogo']
+    logo = ossurl + models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()[
+        'projectLogo']
     # projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()['projectHook']
     projecthook = '75e709c1a28e4d79d3ab6643ef5923d9409af252ca6cd3ed52dc4da40b1e98fc'
     api_url = "https://oapi.dingtalk.com/robot/send?access_token=" + projecthook
 
-    ####获取该项目的项目经理用户ID
+    # 获取该项目的项目经理用户ID
     from project import models as proownermol
-    idList = proownermol.projectName.objects.filter(projectName=data['projectName']).values('projectOwnerId','opsOwnerId').first()
+    idList = proownermol.projectName.objects.filter(projectName=data['projectName']).values('projectOwnerId',
+                                                                                            'opsOwnerId').first()
 
     from sysconf import models as  sysmol
     testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
     ownerNum = sysmol.sys_user.objects.filter(id=int(idList['projectOwnerId'])).values('phone').first()['phone']
     opsNum = sysmol.sys_user.objects.filter(id=int(idList['opsOwnerId'])).values('phone').first()['phone']
+    print(testnum,ownerNum,opsNum)
+    deploystatus = {
+        0: ["发布开始，请前去补充测试结论", 'https://moppowar.oss-accelerate.aliyuncs.com/projectlogo/ook.jpg',testnum],
+        1: ["测试未通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testfail.png'],
+        2: ["测试通过，请前去审核", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testok.png',ownerNum],
+        3: ["审核失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitfail.png'],
+        4: ["审核通过,请前去发布", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitok.png', opsNum],
+        5: ["部署失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangefail.png'],
+        6: ["部署成功，请进行线上测试", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangeok.png',testnum],
+        7: ["发布失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployfail.png'],
+        8: ["发布成功,线上测试正常", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployok.png'],
+        9: ["你有待处理的记录，请尽快处理", testnum,ownerNum,opsNum]
+    }
 
-    if type == 0:
-        newdata = {
-            "msgtype": "markdown",
-            "markdown": {
-                "title": "项目发布",
-                "text": "### " + data['projectName'] + "更新概要\n" +
-                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
-                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
-                        "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
-                        "> #### 测试人员： \r\n"  + "@" + testnum + "\n\r" +
-                        "![screenshot](" + logo + ")\n"
-            },
-            "at": {
-                "atMobiles": [
-                    testnum
-                ],
-                "isAtAll": False
-            }
-        }
-        data = newdata
-    else:
 
-        editdata = {
+
+
+    if type == 0 or type == 2 or type == 4 or type == 6:
+        # 这是开发人员填写完成 @测试人员 数据
+        if type == 0:
+            data['testResult'] = '测试结论未填写'
+        senddata = {
             "msgtype": "markdown",
             "markdown": {
                 "title": "项目发布",
@@ -223,19 +222,59 @@ def dingtalkmsg(data, type):
                         "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
                         "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
                         "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
-                        "> #### 测试人员： \r\n" + data['tester'] + "@" + testnum + "\n\r" +
+                        "> #### 测试人员： \r\n"  + data['tester'] + "@" + deploystatus[int(type)][2] + "\n\r" +
+                        "> #### 测试结论： \r\n" + data['testResult'] + "\n\r" +
                         "![screenshot](" + logo + ")\n"
             },
             "at": {
                 "atMobiles": [
-                    testnum
+                    deploystatus[int(type)][2]
                 ],
                 "isAtAll": False
             }
         }
-        data = editdata
 
-    # requests.post(url=api_url, data=json.dumps(data), headers=headers)
+    elif type == 1 or type == 3 or type == 5 or type == 7 or type == 8:
+    # 这是任何一个阶段 失败的数据格式，默认@全体
+    # 此外包含最后一步线上测试成功 数据格式 也是@全体
+        senddata = {
+            "msgtype": "markdown",
+            "markdown": {
+                "title": "项目发布",
+                "text": "### " + data['projectName'] + "***" + deploystatus[int(type)][0] + "***" + "\n" +
+                        "![screenshot](" + deploystatus[int(type)][1] + ")\n" +
+                        "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
+                        "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
+                        "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
+                        "> #### 测试人员： \r\n"  + data['tester'] +  "\n\r" +
+                        "> #### 测试结论： \r\n"  + data['testResult'] +  "\n\r" +
+                        "![screenshot](" + logo + ")\n"
+            },
+            "at": {
+                "isAtAll": True
+            }
+        }
+
+    else:
+        # type = 9 是 钉功能
+        url = baseconfig.getconfig()['dowithurl']
+        senddata = {
+            "msgtype": "markdown",
+            "markdown": {
+                "title": "项目发布",
+                "text": "### " + data['projectName'] + "\n" +
+                        "### @"+ deploystatus[int(type)][data['dingstep']]+ "***" + deploystatus[int(type)][0] + "***" + "\n" +
+                        "[去处理](" +  url +")" + "\n" +
+                        "![screenshot](" + logo + ")\n"
+            },
+            "at": {
+                "atMobiles": [
+                    deploystatus[int(type)][data['dingstep']]
+                ],
+                "isAtAll": False
+            }
+        }
+    requests.post(url=api_url, data=json.dumps(senddata), headers=headers)
 
 
 ##计算发布时长函数

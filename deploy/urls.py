@@ -6,5 +6,5 @@ urlpatterns = [
     url(r'^addrecord/', views.addrecord),
     url(r'^editrecord/', views.editrecord),
     url(r'^getallrecord/', views.getallrecord),
-    # url(r'^add/', views.add),
+    url(r'^dingrecord/', views.dingrecord),
 ]
