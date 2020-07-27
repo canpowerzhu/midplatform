@@ -79,7 +79,7 @@ def addrecord(request):
         kwargs['modifyModel'] = res['modifyModel']
         kwargs['modifyContent'] = res['modifyContent']
         kwargs['tester'] = testname
-        kwargs['state'] = 1
+        kwargs['state'] = 0
         kwargs['publisher'] = res['publisher']
 
         models.deployRecord.objects.create(**kwargs)
@@ -91,64 +91,77 @@ def addrecord(request):
 
 
 def editrecord(request):
+    del settings.RESULT['data']
+    del settings.RESULT['count']
     # 这里进行修改step状态
     kwargs = {
 
     }
-
-    front_respone = {'code': 2001, 'msg': None}
-    if request.method == 'POST':
-        res = json.loads(request.body.decode('utf-8'))
-        stepinfo = int(res['status'])
+    res = json.loads(request.body.decode('utf-8'))
+    stepinfo = int(res['status'])
     finishTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
     # 测试步骤
     kwargs['step'] = int(res['step']) + 1
     if stepinfo == 1 or stepinfo == 2:
         kwargs['state'] = 1
         kwargs['testStatus'] = res['status']
-        kwargs['testResult'] = res['Result']
-        if stepinfo == 1:
-            kwargs['state'] = 2
-            kwargs['finishTime'] = finishTime
-            kwargs['elapsedTime'] = proTime(res)
+        kwargs['testResult'] = res['result']
+        # if stepinfo == 1:
+        #     kwargs['state'] = 2
+        #     kwargs['finishTime'] = finishTime
+        #     kwargs['elapsedTime'] = proTime(res)
+        #     front_respone['status'] = 2009
     # 审核步骤
     if stepinfo == 3 or stepinfo == 4:
         kwargs['state'] = 1
         kwargs['aduitStatus'] = res['status']
-        kwargs['aduitResult'] = res['Result']
-        if stepinfo == 3:
-            kwargs['state'] = 2
-            kwargs['finishTime'] = finishTime
-            kwargs['elapsedTime'] = proTime(res)
+        kwargs['aduitResult'] = res['result']
+        # if stepinfo == 3:
+        #     kwargs['state'] = 2
+        #     kwargs['finishTime'] = finishTime
+        #     kwargs['elapsedTime'] = proTime(res)
+        #     front_respone['status'] = 2009
 
     # 部署步骤
     if stepinfo == 5 or stepinfo == 6:
         kwargs['state'] = 1
         kwargs['arrangeStatus'] = res['status']
-        kwargs['arrangeResult'] = res['Result']
-        if stepinfo == 5:
-            kwargs['state'] = 2
-            kwargs['finishTime'] = finishTime
-            kwargs['elapsedTime'] = proTime(res)
+        kwargs['arrangeResult'] = res['result']
+        # if stepinfo == 5:
+        #     kwargs['state'] = 2
+        #     kwargs['finishTime'] = finishTime
+        #     kwargs['elapsedTime'] = proTime(res)
+        #     front_respone['status'] = 2009
 
     # 发布步骤
     if stepinfo == 7 or stepinfo == 8:
         kwargs['state'] = 1
         kwargs['deployStatus'] = res['status']
-        kwargs['deployResult'] = res['Result']
+        kwargs['deployResult'] = res['result']
         kwargs['state'] = 3
-        if stepinfo == 7:
-            # 发布状态失败 state = 2
-            kwargs['state'] = 2
-            kwargs['finishTime'] = finishTime
-            kwargs['elapsedTime'] = proTime(res)
+        # if stepinfo == 7:
+        #     # 发布状态失败 state = 2
+        #     kwargs['state'] = 2
+        #     kwargs['finishTime'] = finishTime
+        #     kwargs['elapsedTime'] = proTime(res)
+        #     front_respone['status'] = 2009
+
+    if stepinfo == 1 or stepinfo == 3 or stepinfo == 5 or stepinfo == 7:
+        kwargs['state'] = 2
+        kwargs['finishTime'] = finishTime
+        kwargs['elapsedTime'] = proTime(res)
+        settings.RESULT['code'] = 2009
+        settings.RESULT['msg'] = 'fail'
+    else:
+        kwargs['finishTime'] = finishTime
+        kwargs['elapsedTime'] = proTime(res)
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
 
     models.deployRecord.objects.filter(pk=res['id']).update(**kwargs)
     data = model_to_dict(models.deployRecord.objects.get(pk=res['id']))
-    print(data)
     dingtalkmsg(data, stepinfo)
-    front_respone['msg'] = 'success'
-    return JsonResponse(front_respone)
+    return JsonResponse(settings.RESULT)
 
 
 def dingrecord(request):
@@ -156,13 +169,14 @@ def dingrecord(request):
     # 需要传参 针对哪个发布记录钉  钉哪一步
     if request.method == 'POST' or request.method == 'post':
         res = json.loads(request.body.decode('utf-8'))
-        dingstep = int(res['dingstep'])  # dingstep  1 测试 2 审核 3 运维
+        dingstep = int(res['dingStep'])  # dingstep  1 测试 2 审核 3 运维
         id = int(res['id'])
-        dingcontent =models.deployRecord.objects.filter(pk=id).values('projectName','tester').first()
-        data = {'tester': dingcontent['tester'],'dingstep': dingstep,'projectName':dingcontent['projectName']}
-        dingtalkmsg(data,9)
-        return  HttpResponse('ok')
-
+        dingcontent = models.deployRecord.objects.filter(pk=id).values('projectName', 'tester').first()
+        data = {'tester': dingcontent['tester'], 'dingstep': dingstep, 'projectName': dingcontent['projectName']}
+        dingtalkmsg(data, 9)
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+        return JsonResponse(settings.RESULT)
 
 
 # alarm模块用于告知至dingding webhook
@@ -192,22 +206,22 @@ def dingtalkmsg(data, type):
     testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
     ownerNum = sysmol.sys_user.objects.filter(id=int(idList['projectOwnerId'])).values('phone').first()['phone']
     opsNum = sysmol.sys_user.objects.filter(id=int(idList['opsOwnerId'])).values('phone').first()['phone']
-    print(testnum,ownerNum,opsNum)
+    print(testnum, ownerNum, opsNum)
     deploystatus = {
-        0: ["发布开始，请前去补充测试结论", 'https://moppowar.oss-accelerate.aliyuncs.com/projectlogo/ook.jpg',testnum],
+        0: ["发布开始，请前去补充测试结论", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/start.png',
+            testnum],
         1: ["测试未通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testfail.png'],
-        2: ["测试通过，请前去审核", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testok.png',ownerNum],
+        2: ["测试通过，请前去审核", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/testok.png', ownerNum],
         3: ["审核失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitfail.png'],
         4: ["审核通过,请前去发布", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/aduitok.png', opsNum],
         5: ["部署失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangefail.png'],
-        6: ["部署成功，请进行线上测试", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangeok.png',testnum],
+        6: ["部署成功，请进行线上测试", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/arrangeok.png',
+            testnum],
         7: ["发布失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployfail.png'],
         8: ["发布成功,线上测试正常", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/deployok.png'],
-        9: ["你有待处理的记录，请尽快处理", testnum,ownerNum,opsNum]
+        9: ["你有待处理的记录，请尽快处理", testnum, ownerNum, opsNum,
+            'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/msgalarm.png']
     }
-
-
-
 
     if type == 0 or type == 2 or type == 4 or type == 6:
         # 这是开发人员填写完成 @测试人员 数据
@@ -222,7 +236,7 @@ def dingtalkmsg(data, type):
                         "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
                         "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
                         "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
-                        "> #### 测试人员： \r\n"  + data['tester'] + "@" + deploystatus[int(type)][2] + "\n\r" +
+                        "> #### 测试人员： \r\n" + data['tester'] + "@" + deploystatus[int(type)][2] + "\n\r" +
                         "> #### 测试结论： \r\n" + data['testResult'] + "\n\r" +
                         "![screenshot](" + logo + ")\n"
             },
@@ -235,8 +249,8 @@ def dingtalkmsg(data, type):
         }
 
     elif type == 1 or type == 3 or type == 5 or type == 7 or type == 8:
-    # 这是任何一个阶段 失败的数据格式，默认@全体
-    # 此外包含最后一步线上测试成功 数据格式 也是@全体
+        # 这是任何一个阶段 失败的数据格式，默认@全体
+        # 此外包含最后一步线上测试成功 数据格式 也是@全体
         senddata = {
             "msgtype": "markdown",
             "markdown": {
@@ -246,8 +260,8 @@ def dingtalkmsg(data, type):
                         "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
                         "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
                         "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
-                        "> #### 测试人员： \r\n"  + data['tester'] +  "\n\r" +
-                        "> #### 测试结论： \r\n"  + data['testResult'] +  "\n\r" +
+                        "> #### 测试人员： \r\n" + data['tester'] + "\n\r" +
+                        "> #### 测试结论： \r\n" + data['testResult'] + "\n\r" +
                         "![screenshot](" + logo + ")\n"
             },
             "at": {
@@ -263,8 +277,10 @@ def dingtalkmsg(data, type):
             "markdown": {
                 "title": "项目发布",
                 "text": "### " + data['projectName'] + "\n" +
-                        "### @"+ deploystatus[int(type)][data['dingstep']]+ "***" + deploystatus[int(type)][0] + "***" + "\n" +
-                        "[去处理](" +  url +")" + "\n" +
+                        "### @" + deploystatus[int(type)][data['dingstep']] + "***" + deploystatus[int(type)][
+                            0] + "***" + "\n" +
+                        "![screenshot](" + deploystatus[int(type)][4] + ")\n" +
+                        "[去处理](" + url + ")" + "\n" +
                         "![screenshot](" + logo + ")\n"
             },
             "at": {
@@ -295,21 +311,55 @@ def issuerecord(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
 
-    res = json.loads(request.body.decode('utf-8'))
-    print(res)
-    kwargs= {'recordId':res['recordId'],'content':res['content'],'srcIP':ip,'username':res['username']}
+    if request.method == 'PUT' or request.method == 'put':
+        res = json.loads(request.body.decode('utf-8'))
+        kwargs = {'recordId': res['recordId'], 'content': res['content'], 'srcIP': ip, 'username': res['userName']}
+        try:
+            models.issueRecord.objects.filter(id=res['id']).update(**kwargs)
+            settings.RESULT['code'] = 2001
+            settings.RESULT['msg'] = 'success'
+        except Exception as e:
+            settings.RESULT['code'] = 2002
+            settings.RESULT['msg'] = 'fail'
+            settings.RESULT['data'] = str(e)
+        return JsonResponse(settings.RESULT)
 
-    try:
-        models.issueRecord.objects.update_or_create(id=res['id'], defaults=kwargs)
-        settings.RESULT['code'] = 2001
-        settings.RESULT['msg'] = 'success'
-    except Exception as e:
-        print(e)
+    if request.method == 'POST' or request.method == 'post':
+        res = json.loads(request.body.decode('utf-8'))
+        kwargs = {'recordId': res['recordId'], 'content': res['content'], 'srcIP': ip, 'username': res['userName']}
+        try:
+            models.issueRecord.objects.create(**kwargs)
+            settings.RESULT['code'] = 2001
+            settings.RESULT['msg'] = 'success'
+        except Exception as e:
+            settings.RESULT['code'] = 2002
+            settings.RESULT['msg'] = 'fail'
+            settings.RESULT['data'] = str(e)
+        return JsonResponse(settings.RESULT)
+
+    if request.method == 'GET' or request.method == 'get':
+        # 这里有列表详情，和文章详情 依据是否有id判断
+        id = request.GET.get('id')
+        if id == None:
+            # 查询列表
+            data = models.issueRecord.objects.all().values()
+            settings.RESULT['data'] = list(data)
+            settings.RESULT['count'] = data.count()
+        else:
+            # 查询详情
+            data = models.issueRecord.objects.filter(pk=id).values()
+            settings.RESULT['data'] = list(data)
         settings.RESULT['code'] = 2002
-        settings.RESULT['msg'] = 'fail'
-        settings.RESULT['data'] = str(e)
+        settings.RESULT['msg'] = 'success'
+        return JsonResponse(settings.RESULT)
 
 
-
-
-    return  JsonResponse(settings.RESULT)
+def issuerecordpic(request):
+    res = json.loads(request.body.decode('utf-8'))
+    from common import ossupload
+    picurl = ossupload.uploadBase64Pic(res['img'], '', res['userName'])
+    settings.RESULT['code'] = 2001
+    settings.RESULT['msg'] = 'success'
+    settings.RESULT['data'] = picurl
+    del settings.RESULT['count']
+    return JsonResponse(settings.RESULT)

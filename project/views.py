@@ -65,7 +65,7 @@ def baseinfo(request):
 
     if request.method == 'POST' or request.method == 'post':
         res = json.loads(request.body.decode('utf-8'))
-        uploadPic = ossupload.uploadBase64Pic(res['projectLogo'], res['projectName'])
+        uploadPic = ossupload.uploadBase64Pic(res['projectLogo'], res['projectName'],'')
         front_respone = {'code': None, 'msg': None}
 
         try:
