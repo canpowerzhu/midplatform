@@ -216,7 +216,7 @@ def domainsync(request):
         else:
             settings.RESULT['code'] = 2008
             settings.RESULT['msg'] = 'fail'
-            settings.RESULT['data'] = settings.codeMsg['2008']
+            settings.RESULT['data'] = settings.codeMsg[2008]
             return JsonResponse(settings.RESULT)
 
         models.Domainlist.objects.filter(name_account=account).delete()

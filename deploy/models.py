@@ -45,6 +45,7 @@ class deployRecord(models.Model):
 
 class issueRecord(models.Model):
     recordId = models.IntegerField(verbose_name='关联发布记录的记录ID 可点击超链接查看详情')
+    title = models.TextField(verbose_name='内容标题')
     content = models.TextField(verbose_name='详细问题')
     srcIP = models.CharField(max_length=20, verbose_name='操作IP')
     username = models.CharField(max_length=20, verbose_name='哪位用户操作')
