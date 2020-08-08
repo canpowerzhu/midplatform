@@ -105,7 +105,15 @@ def editrecord(request):
     stepinfo = int(res['status'])
     finishTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
     # 测试步骤
-    kwargs['step'] = int(res['step']) + 1
+
+    curstep = models.deployRecord.objects.filter(pk=res['id']).values('step').first()['step']
+    if res['step'] <= int(curstep):
+        settings.RESULT['code'] = 20091
+        settings.RESULT['msg'] = 'fail'
+        settings.RESULT['date'] = '重复提交'
+        return  JsonResponse(settings.RESULT)
+    else:
+        kwargs['step'] = int(res['step']) + 1
     if stepinfo == 1 or stepinfo == 2:
         kwargs['state'] = 1
         kwargs['testStatus'] = res['status']

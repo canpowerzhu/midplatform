@@ -4,7 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from midplatform import  settings
 from domains import models
 import json
-import requests, request
+import requests
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest

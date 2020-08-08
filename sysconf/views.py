@@ -278,7 +278,7 @@ def sysusergrant(request):
             return JsonResponse({'code': 2002, 'msg': 'fail', 'data': '授权ID为空'})
         else:
             # for i in roleIds:
-            object, created = models.sys_user_role.objects.update_or_create(user_id=res['userId'], role_id=roleIds)
+            object, created = models.sys_user_role.objects.update_or_create(user_id=int(res['userId']), defaults={'role_id':roleIds})
             print(object, created)
             ##这里去更新用户表的字段type 区分类型
             models.sys_user.objects.filter(pk=res['userId']).update(type=roleIds)
