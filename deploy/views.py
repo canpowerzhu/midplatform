@@ -107,7 +107,8 @@ def editrecord(request):
     # 测试步骤
 
     curstep = models.deployRecord.objects.filter(pk=res['id']).values('step').first()['step']
-    if res['step'] <= int(curstep):
+    print(curstep,res['step'])
+    if res['step'] < int(curstep):
         settings.RESULT['code'] = 20091
         settings.RESULT['msg'] = 'fail'
         settings.RESULT['date'] = '重复提交'

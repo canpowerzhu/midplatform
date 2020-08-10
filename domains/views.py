@@ -9,6 +9,7 @@ from aliyunsdkcore.client import AcsClient
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
 from django.core.paginator import Paginator
+from django.forms.models import model_to_dict
 
 #### 域名接口
 s = requests.session()
@@ -116,30 +117,28 @@ def domainlist(request):
     """
     域名列表的接口
     """
-
     limit = int(request.GET.get('limit', default=10))
     page = int(request.GET.get('page', default=1))
-
-    res = models.Domainlist.objects.all().order_by('expireDate').values()
-    count = models.Domainlist.objects.all().count()
-    # 每页显示10条记录
-    paginator = Paginator(res, limit)
-    # 获取第page页的数据
-    pageData = paginator.page(page)
-    if len(pageData) > 0:
-        datalist = list(pageData)
-
-        settings.RESULT['code'] = 2001
-        settings.RESULT['msg'] = 'success'
-        settings.RESULT['count'] = count
-        settings.RESULT['data'] = datalist
-        return JsonResponse(settings.RESULT)
-        # data = json.dumps(settings.RESULT)
-        # return HttpResponse(data)
+    domainNameSearch = request.GET.get('domainName')
+    if domainNameSearch != None:
+        res = models.Domainlist.objects.filter(domainName__contains=domainNameSearch).values().first()
+        count = 1
+        datalist =[res]
     else:
-        settings.RESULT['msg'] = "fail"
-        print(settings.RESULT)
-    return HttpResponse("fail")
+        res = models.Domainlist.objects.all().order_by('expireDate').values()
+        count = res.count()
+        # 每页显示10条记录
+        paginator = Paginator(res, limit)
+        # 获取第page页的数据
+        pageData = paginator.page(page)
+        datalist = list(pageData)
+    settings.RESULT['code'] = 2001
+    settings.RESULT['msg'] = 'success'
+    settings.RESULT['count'] = count
+    settings.RESULT['data'] = datalist
+    return JsonResponse(settings.RESULT)
+
+
 
 
 def modifyaccount(request):
