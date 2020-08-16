@@ -15,5 +15,6 @@ urlpatterns = [
     url(r'^sysconf/', include("sysconf.urls")),
     url(r'^project/', include("project.urls")),
     url(r'^mophealth/', include("mophealth.urls")),
+    url(r'^cmdb/', include("cmdb.urls")),
 
 ]

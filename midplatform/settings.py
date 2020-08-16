@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'project.apps.ProjectConfig',
     'sysconf.apps.SysconfConfig',
     'mophealth.apps.MophealthConfig',
+ 'cmdb.apps.CmdbConfig',
 
 ]
 
