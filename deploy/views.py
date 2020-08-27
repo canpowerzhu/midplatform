@@ -25,7 +25,7 @@ def getallrecord(request):
 
     projectName = request.GET.get('projectName')
     publisher = request.GET.get('publisher')
-
+    state = request.GET.get('state')
 
     if publisher != None and projectName != None:
         kwargs['publisher'] = publisher
@@ -33,6 +33,9 @@ def getallrecord(request):
 
     elif projectName != None:
         kwargs['projectName'] = projectName
+
+    elif state != None:
+        kwargs['state'] = state
 
     elif publisher != None:
         kwargs['Publisher'] = publisher
@@ -78,10 +81,14 @@ def addrecord(request):
             kwargs['isModifySql'] = 1
             kwargs['sqlDetail'] = res['sqlDetail']
 
+        if res['remark'] != None:
+            kwargs['remark'] = res['remark']
+
         kwargs['projectName'] = res['projectName']
         kwargs['isRollBack'] = res['isRollBack']
         kwargs['modifyModel'] = res['modifyModel']
         kwargs['modifyContent'] = res['modifyContent']
+
         kwargs['tester'] = testname
         kwargs['state'] = 0
         kwargs['publisher'] = res['publisher']
@@ -107,12 +114,12 @@ def editrecord(request):
     # 测试步骤
 
     curstep = models.deployRecord.objects.filter(pk=res['id']).values('step').first()['step']
-    print(curstep,res['step'])
+    print(curstep, res['step'])
     if res['step'] < int(curstep):
         settings.RESULT['code'] = 20091
         settings.RESULT['msg'] = 'fail'
         settings.RESULT['date'] = '重复提交'
-        return  JsonResponse(settings.RESULT)
+        return JsonResponse(settings.RESULT)
     else:
         kwargs['step'] = int(res['step']) + 1
     if stepinfo == 1 or stepinfo == 2:
@@ -126,13 +133,11 @@ def editrecord(request):
         kwargs['aduitStatus'] = res['status']
         kwargs['aduitResult'] = res['result']
 
-
     # 部署步骤
     if stepinfo == 5 or stepinfo == 6:
         kwargs['state'] = 1
         kwargs['arrangeStatus'] = res['status']
         kwargs['arrangeResult'] = res['result']
-
 
     # 发布步骤
     if stepinfo == 7 or stepinfo == 8:
@@ -140,7 +145,6 @@ def editrecord(request):
         kwargs['deployStatus'] = res['status']
         kwargs['deployResult'] = res['result']
         kwargs['state'] = 3
-
 
     if stepinfo == 1 or stepinfo == 3 or stepinfo == 5 or stepinfo == 7:
         kwargs['state'] = 2
@@ -199,6 +203,7 @@ def dingtalkmsg(data, type):
                                                                                             'opsOwnerId').first()
 
     from sysconf import models as  sysmol
+    url = baseconfig.getconfig()['dowithurl']
     testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
     ownerNum = sysmol.sys_user.objects.filter(id=int(idList['projectOwnerId'])).values('phone').first()['phone']
     opsNum = sysmol.sys_user.objects.filter(id=int(idList['opsOwnerId'])).values('phone').first()['phone']
@@ -206,15 +211,18 @@ def dingtalkmsg(data, type):
         0: ["发布开始，请前去补充测试结论", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newstart.png',
             testnum],
         1: ["测试未通过", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newtestfail.png'],
-        2: ["测试通过，请前去审核", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newtestok.png', ownerNum],
+        2: ["测试通过，请前去审核", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newtestok.png',
+            ownerNum],
         3: ["审核失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newaduitfail.png'],
-        4: ["审核通过,请前去发布", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newaduitok.png', opsNum],
+        4: ["审核通过,请前去发布", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newaduitok.png',
+            opsNum],
         5: ["部署失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newarrangefail.png'],
         6: ["部署成功，请进行线上测试", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newarrangeok.png',
             testnum],
         7: ["发布失败", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newdeployfail.png'],
         8: ["发布成功,线上测试正常", 'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newdeployok.png'],
-        9: ["你有待处理的记录，请尽快处理", testnum, ownerNum, opsNum,'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newmsgalarm.png']
+        9: ["你有待处理的记录，请尽快处理", testnum, ownerNum, opsNum,
+            'https://moppowar.oss-accelerate.aliyuncs.com/midplatform/deploystatus/newmsgalarm.png']
     }
 
     if type == 0 or type == 2 or type == 4 or type == 6:
@@ -232,7 +240,8 @@ def dingtalkmsg(data, type):
                         "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
                         "> #### 测试人员： \r\n" + data['tester'] + "\n\r" +
                         "@" + deploystatus[int(type)][2] + "\n\r" +
-                        "![screenshot](" + deploystatus[int(type)][1] + ")\n"
+                        "![screenshot](" + deploystatus[int(type)][1] + ")\n\r" +
+                        "  [去处理](" + url + ")" + "\n"
 
             },
             "at": {
@@ -251,12 +260,13 @@ def dingtalkmsg(data, type):
             "markdown": {
                 "title": "项目发布",
                 "text": "### " + data['projectName'] + "***" + deploystatus[int(type)][0] + "***" + "\n" +
-                         "![screenshot](" + logo + ")\n" +
+                        "![screenshot](" + logo + ")\n" +
                         "> #### 更新模块：\r\n" + data['modifyModel'] + "\n\r" +
                         "> #### 更新内容：\r\n " + data['modifyContent'] + "\n\r" +
                         "> #### 开发人员： \r\n" + data['publisher'] + "\n\r" +
                         "> #### 测试人员： \r\n" + data['tester'] + "\n\r" +
-                        "![screenshot](" + deploystatus[int(type)][1] + ")\n"
+                        "![screenshot](" + deploystatus[int(type)][1] + ")\n\r" +
+                        "  [去处理](" + url + ")" + "\n"
             },
             "at": {
                 "isAtAll": True
@@ -265,13 +275,13 @@ def dingtalkmsg(data, type):
 
     else:
         # type = 9 是 钉功能
-        url = baseconfig.getconfig()['dowithurl']
+
         senddata = {
             "msgtype": "markdown",
             "markdown": {
                 "title": "项目发布",
                 "text": "### 项目" + data['projectName'] + "\n" +
-                        "### @" + deploystatus[int(type)][data['dingstep']] +  "\n" +
+                        "### @" + deploystatus[int(type)][data['dingstep']] + "\n" +
                         "![screenshot](" + deploystatus[int(type)][4] + ")\n\r" +
                         "  [去处理](" + url + ")" + "\n"
             },
@@ -305,7 +315,8 @@ def issuerecord(request):
 
     if request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
-        kwargs = {'recordId': res['recordId'], 'title': res['title'],'content': res['content'], 'srcIP': ip, 'username': res['userName']}
+        kwargs = {'recordId': res['recordId'], 'title': res['title'], 'content': res['content'], 'srcIP': ip,
+                  'username': res['userName']}
         try:
             models.issueRecord.objects.filter(id=res['id']).update(**kwargs)
             settings.RESULT['code'] = 2001
@@ -318,7 +329,8 @@ def issuerecord(request):
 
     if request.method == 'POST' or request.method == 'post':
         res = json.loads(request.body.decode('utf-8'))
-        kwargs = {'recordId': res['recordId'],'title': res['title'], 'content': res['content'], 'srcIP': ip, 'username': res['userName']}
+        kwargs = {'recordId': res['recordId'], 'title': res['title'], 'content': res['content'], 'srcIP': ip,
+                  'username': res['userName']}
         try:
             models.issueRecord.objects.create(**kwargs)
             settings.RESULT['code'] = 2001

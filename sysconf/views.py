@@ -36,7 +36,7 @@ def getrouter(request):
             'sort', 'id', 'KeepAlive',
             'parentId', 'path', 'redirect',
             'routerName', 'target', 'title',
-            'type', 'code')
+            'type', 'code').order_by('sort')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -54,7 +54,7 @@ def router(request):
     if request.method == 'GET' or request.method == 'get':
         router = models.sys_menu.objects.filter(deleted=1).values('component', 'hidden', 'icon', 'sort', 'id',
                                                                   'KeepAlive', 'parentId', 'path', 'redirect',
-                                                                  'routerName', 'target', 'title', 'type', 'code')
+                                                                  'routerName', 'target', 'title', 'type', 'code').order_by('sort')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -251,6 +251,9 @@ def sysuser(request):
                     settings.RESULT['msg'] = 'fail'
                     return JsonResponse(settings.RESULT)
         try:
+
+            # 为新用户设置默认密码 moppo123
+            sysUserDict['password'] = 'moppo123'
             models.sys_user.objects.create(**sysUserDict)
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'success'

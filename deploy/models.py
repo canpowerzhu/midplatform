@@ -22,6 +22,7 @@ class deployRecord(models.Model):
     isRollBack = models.BooleanField(verbose_name="是否可以回滚")
     modifyModel = models.CharField(max_length=1024, verbose_name="更新哪些模块")
     modifyContent = models.TextField(max_length=5120, verbose_name="更新的内容")
+    remark = models.TextField(max_length=5120, verbose_name="增加备注")
     state = models.IntegerField(choices=stateChoice,verbose_name="更新进度 0- 未处理，1- 处理中，2-失败 ，3-成功")
     publisher = models.CharField(max_length=500, verbose_name="发布负责人")
     isModifyCache = models.IntegerField(default=0,choices=cacheChoice,verbose_name="是否修改缓存")
