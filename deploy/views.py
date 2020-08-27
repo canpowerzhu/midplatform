@@ -190,6 +190,7 @@ def dingtalkmsg(data, type):
     from project import models
     from common import baseconfig
     ossurl = baseconfig.getconfig()['baseFileUrl']
+    print(data)
     headers = {'Content-Type': 'application/json;charset=utf-8'}
     logo = ossurl + models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()[
         'projectLogo']
@@ -203,7 +204,9 @@ def dingtalkmsg(data, type):
                                                                                             'opsOwnerId').first()
 
     from sysconf import models as  sysmol
-    url = baseconfig.getconfig()['dowithurl']
+    dowithbaseurl = baseconfig.getconfig()['dowithurl']
+    url = dowithbaseurl + '?id='+ str(data['id'])
+    print(url)
     testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
     ownerNum = sysmol.sys_user.objects.filter(id=int(idList['projectOwnerId'])).values('phone').first()['phone']
     opsNum = sysmol.sys_user.objects.filter(id=int(idList['opsOwnerId'])).values('phone').first()['phone']
