@@ -209,7 +209,7 @@ def domainsync(request):
                                       domainName=data[i]['domainName'],
                                       locked=data[i]['locked'],
                                       autorenewEnabled=data[i]['autorenewEnabled'],
-                                      expireDate=data[i]['expireDate'].split('T')[0],
+                                      expireDate=data[i]['expireDate'].split('T')[0].split('T')[0],
                                       createDate=data[i]['createDate'].split('T')[0])
                 )
         else:

@@ -11,4 +11,5 @@ from cmdb import views
 urlpatterns = [
     url(r'^region/', views.region),
     url(r'^assetgroup/', views.assetgroup),
+    url(r'^asset/', views.asset),
 ]
