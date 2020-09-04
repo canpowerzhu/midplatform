@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
-
+from django.db.models import Max
 import datetime
 
 
@@ -94,9 +94,12 @@ def addrecord(request):
         kwargs['publisher'] = res['publisher']
 
         models.deployRecord.objects.create(**kwargs)
+        get_res= models.deployRecord.objects.all().aggregate(Max('id'))
+
         front_respone = {'code': 2001, 'msg': None}
         front_respone['msg'] = 'success'
         res['tester'] = testname
+        res['id'] = get_res['id__max']
         dingtalkmsg(res, 0)
         return JsonResponse(front_respone)
 
@@ -172,7 +175,7 @@ def dingrecord(request):
         dingstep = int(res['dingStep'])  # dingstep  1 测试 2 审核 3 运维
         id = int(res['id'])
         dingcontent = models.deployRecord.objects.filter(pk=id).values('projectName', 'tester').first()
-        data = {'tester': dingcontent['tester'], 'dingstep': dingstep, 'projectName': dingcontent['projectName']}
+        data = {'id':id,'tester': dingcontent['tester'], 'dingstep': dingstep, 'projectName': dingcontent['projectName']}
         dingtalkmsg(data, 9)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -205,8 +208,9 @@ def dingtalkmsg(data, type):
 
     from sysconf import models as  sysmol
     dowithbaseurl = baseconfig.getconfig()['dowithurl']
+    print(data)
     url = dowithbaseurl + '?id='+ str(data['id'])
-    print(url)
+    # print(url)
     testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
     ownerNum = sysmol.sys_user.objects.filter(id=int(idList['projectOwnerId'])).values('phone').first()['phone']
     opsNum = sysmol.sys_user.objects.filter(id=int(idList['opsOwnerId'])).values('phone').first()['phone']
