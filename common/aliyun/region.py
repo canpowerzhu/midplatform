@@ -5,8 +5,11 @@ from common.aliyun import instance
 from cmdb import models as cmdbmodels
 import  datetime
 from midplatform import settings
+
+# 同步对应region的主机
 def syncregion(resqBody):
-    data = instance.InstanceSync(resqBody['region'], resqBody['pageSize'], resqBody['pageNum'])
+    data = instance.InstanceSync(resqBody['regionId'], resqBody['pageSize'], resqBody['pageNum'])
+    instanceList=[]
     for i in range(data['TotalCount']):
         instanceInfo = data['Instances']['Instance'][int(i)]
 
@@ -55,6 +58,10 @@ def syncregion(resqBody):
         else:
             ostype = 2
 
+
+        ## 线上数据不存在，线下存在处理
+
+        instanceList.append(instanceInfo['InstanceId'])
         cmdbmodels.asset.objects.update_or_create(instanceId=instanceInfo['InstanceId'],
                                                   defaults={'instanceName': instanceInfo['InstanceName'],
                                                             'hostname': instanceInfo['HostName'],
@@ -81,6 +88,11 @@ def syncregion(resqBody):
                                                             'expiredTime': datetime.datetime.strptime(
                                                                 instanceInfo['ExpiredTime'],
                                                                 "%Y-%m-%dT%H:%MZ")})
+
+
+    # 处理线上已释放的数据
+    # 这里需要注意 前提条件 在同一regionId的情况下
+    cmdbmodels.asset.objects.filter(regionId=resqBody['regionId']).exclude(instanceId__in=instanceList).delete()
     settings.RESULT['code'] = 2001
     settings.RESULT['msg'] = 'success'
     settings.RESULT['data'] = '同步完成'
