@@ -36,7 +36,7 @@ def getrouter(request):
             'sort', 'id', 'KeepAlive',
             'parentId', 'path', 'redirect',
             'routerName', 'target', 'title',
-            'type', 'code')
+            'type', 'code').order_by('sort')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -54,7 +54,7 @@ def router(request):
     if request.method == 'GET' or request.method == 'get':
         router = models.sys_menu.objects.filter(deleted=1).values('component', 'hidden', 'icon', 'sort', 'id',
                                                                   'KeepAlive', 'parentId', 'path', 'redirect',
-                                                                  'routerName', 'target', 'title', 'type', 'code')
+                                                                  'routerName', 'target', 'title', 'type', 'code').order_by('sort')
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -251,6 +251,9 @@ def sysuser(request):
                     settings.RESULT['msg'] = 'fail'
                     return JsonResponse(settings.RESULT)
         try:
+
+            # 为新用户设置默认密码 moppo123
+            sysUserDict['password'] = 'moppo123'
             models.sys_user.objects.create(**sysUserDict)
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'success'
@@ -278,7 +281,7 @@ def sysusergrant(request):
             return JsonResponse({'code': 2002, 'msg': 'fail', 'data': '授权ID为空'})
         else:
             # for i in roleIds:
-            object, created = models.sys_user_role.objects.update_or_create(user_id=res['userId'], role_id=roleIds)
+            object, created = models.sys_user_role.objects.update_or_create(user_id=int(res['userId']), defaults={'role_id':roleIds})
             print(object, created)
             ##这里去更新用户表的字段type 区分类型
             models.sys_user.objects.filter(pk=res['userId']).update(type=roleIds)
@@ -343,18 +346,28 @@ def sysRole(request):
     kwargs = {
         ###动态参数拼接
     }
-    res = json.loads(request.body.decode('utf-8'))
-    if 'code' in res.keys() and res['code'] != None:
-        kwargs['code'] = res['code']
-    if 'name' in res.keys() and res['name'] != None:
-        kwargs['name'] = res['name']
-    if 'note' in res.keys() and res['note'] != None:
-        kwargs['note'] = res['note']
+
     try:
         if request.method == 'POST' or request.method == 'post':
+            res = json.loads(request.body.decode('utf-8'))
+
+            if 'code' in res.keys() and res['code'] != None:
+                kwargs['code'] = res['code']
+            if 'name' in res.keys() and res['name'] != None:
+                kwargs['name'] = res['name']
+            if 'note' in res.keys() and res['note'] != None:
+                kwargs['note'] = res['note']
             models.sys_role.objects.create(**kwargs)
 
         if request.method == 'PUT' or request.method == 'put':
+            res = json.loads(request.body.decode('utf-8'))
+
+            if 'code' in res.keys() and res['code'] != None:
+                kwargs['code'] = res['code']
+            if 'name' in res.keys() and res['name'] != None:
+                kwargs['name'] = res['name']
+            if 'note' in res.keys() and res['note'] != None:
+                kwargs['note'] = res['note']
             ###编辑角色，必须带有ID
             models.sys_role.objects.filter(pk=res['id']).update(**kwargs)
         if request.method == 'DELETE' or request.method == 'delete':
@@ -362,8 +375,8 @@ def sysRole(request):
             models.sys_role.objects.filter(id=id).update(deleted=1)
 
 
-    except:
-        return JsonResponse({'code': 2001, 'msg': 'success'})
+    except Exception as e:
+        return JsonResponse({'code': 2009, 'msg': 'fail', 'data': str(e)})
 
     return JsonResponse({'code': 2001, 'msg': 'success'})
 
@@ -412,3 +425,26 @@ def sysuserlogin(request):
 def codeMsg(request):
     if request.method == 'GET' or request.method == 'get':
         return JsonResponse(settings.codeMsg)
+
+
+### 用于发布模块使用的用户相关
+def deployuser(request):
+    ## 获取类型 测试人员 type=0 还是项目负责人 type=1 运维 type=2
+    type = int(request.GET.get('type'))
+    if type == 0:
+        typeUser = 2
+
+    if type == 1:
+        typeUser = 3
+
+
+    if type == 2:
+        typeUser = 1
+
+    typeUserList = models.sys_user_role.objects.filter(role_id=typeUser).values_list('user_id', flat=True)
+    res = models.sys_user.objects.filter(pk__in=list(typeUserList)).values('id','nickname', 'phone')
+    settings.RESULT['code'] =2001
+    settings.RESULT['msg'] = 'success'
+    settings.RESULT['data'] = list(res)
+    print(settings.RESULT)
+    return JsonResponse(settings.RESULT)

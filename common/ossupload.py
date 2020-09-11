@@ -36,21 +36,26 @@ def update_fil_file(envtype,project,filename,file):
 
 
 
-def uploadBase64Pic(data,projectname=''):
+def uploadBase64Pic(data,projectname='',recordpic=''):
+    print('这是data %s' %data)
+    print('这是projectname %s' %projectname)
+    print('这是recordpic %s' %recordpic)
     b64_data = data.split(';base64,')[1]
     logoType = data.split(';base64,')[0].split('/')[1]
     data = base64.b64decode(b64_data)
+    import calendar
+    import time
+    ts = str(calendar.timegm(time.gmtime()))
     if projectname :
         print('项目logo')
         remotePath='midplatform/projectlogo/' + projectname + '.' + logoType
+    elif recordpic:
+        print('record问题追踪图片')
+        remotePath = 'midplatform/recordpic/'+ recordpic +'/' + ts + '.' + logoType
     else:
         print('用户头像')
-        import calendar
-        import time
-        ts = str(calendar.timegm(time.gmtime()))
+
         remotePath = 'midplatform/avatar/' + ts + '.' + logoType
-
-
     res = bucket.put_object(remotePath, data)
     if not res.status == 200:
         return False

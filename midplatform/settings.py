@@ -27,8 +27,8 @@ DEBUG = True
 
 
 ###解决跨域问题
-# ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['*']
+# 此选项要打开 否则后面获取用户真实IP 无法获取
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'project.apps.ProjectConfig',
     'sysconf.apps.SysconfConfig',
     'mophealth.apps.MophealthConfig',
+ 'cmdb.apps.CmdbConfig',
 
 ]
 
@@ -168,7 +169,8 @@ codeMsg = {
     2006: '主键重复',
     2007: '请求域名接口失败，稍后再试',
     2008: '请求域名，无任何解析',
-    2009: '访问失败',
+    2009: '失败',
+    20091: '重复提交',
 }
 
 
