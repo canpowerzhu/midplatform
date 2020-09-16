@@ -86,8 +86,10 @@ class eip(models.Model):
     )
 
     regionId = models.CharField(max_length=100, verbose_name='所属region')
-    instanceId = models.CharField(max_length=100, verbose_name='所绑定实例ID')
-    resourceId = models.CharField(max_length=100, verbose_name='所资源组ID')
+    allocationId = models.CharField(max_length=100, verbose_name='实例ID')
+    allocationName = models.CharField(blank=True,null=True,max_length=100, verbose_name='实例名称')
+    instanceId = models.CharField(blank=True, null=True,max_length=100, verbose_name='所绑定实例ID')
+    resourceGroupId = models.CharField(blank=True,null=True,max_length=100, verbose_name='所资源组ID')
     bandWidth = models.IntegerField(verbose_name="带宽峰值 ，单位是MBps")
     isp = models.IntegerField(choices=isp_choice,verbose_name="线路类型 0-BGP 1-BGP_PRO 2-")
     eipAdress = models.GenericIPAddressField(verbose_name="弹性IP地址")
@@ -127,7 +129,7 @@ class securityGroupRule(models.Model):
 #资源组
 class resourceGroup(models.Model):
     name = models.CharField(max_length=300,verbose_name='资源组名称')
-    accountId = models.IntegerField(verbose_name='所属账号ID')
+    accountId = models.BigIntegerField(verbose_name='所属账号ID')
     resourceId = models.CharField(max_length=100,verbose_name='资源组ID')
     status = models.CharField(max_length=100,verbose_name="资源组状态")
     displayName = models.CharField(null=True,blank=True,max_length=100,verbose_name='资源组显示名称')

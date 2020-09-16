@@ -10,6 +10,7 @@ accesskeyId = baseconfig.getconfig()['accessKey']
 accessSecret = baseconfig.getconfig()['accessSecret']
 
 from cmdb import models as cmdbmodels
+from django.core.paginator import Paginator
 
 # 可用区相关
 def region(request):
@@ -133,7 +134,7 @@ def asset(request):
         return JsonResponse(settings.RESULT)
 
     if request.method == 'GET' or request.method == 'get':
-        from django.core.paginator import Paginator
+
         limit = request.GET.get('limit')
         page = request.GET.get('page')
         res = cmdbmodels.asset.objects.all().values()
@@ -167,3 +168,40 @@ def eipinfo(request):
         actionTypeInt = resbody['type']
         respData = actionType[actionTypeInt](resbody) # 这是去执行对应的方法
         return  JsonResponse(respData)
+
+    if request.method == 'get' or request.method == 'GET':
+        data = cmdbmodels.eip.objects.all().values()
+        limit = request.GET.get('limit',default=10)
+        page = request.GET.get('page',default=1)
+
+        assetlist = Paginator(data, limit)  # 进行分页
+        page_asset = assetlist.page(page)  #
+        count = data.count()
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+        settings.RESULT['data'] = list(page_asset)
+        settings.RESULT['count'] = count
+        return  JsonResponse(settings.RESULT)
+
+
+
+# 资产组
+# 移出资产组，加入资产组，罗列资产组,同步资产组
+
+def resourceGroup(request):
+    from common.aliyun import resourceGroup
+    if request.method == 'POST' or request.method == 'post':
+        # 移出资产组、加入资产组、同步资产组
+        actionType = {
+            0: resourceGroup.syncResourceGroup,
+            1: resourceGroup.joinResourceGroup,
+            2: resourceGroup.removeResourceGroup,
+        }
+        reqBody = json.loads(request.body.decode('utf-8'))
+        respData = actionType[reqBody['type']]()
+        return JsonResponse(respData)
+
+    if request.method == 'GET' or request.method == 'get':
+        # 罗列资产组
+        respdata=resourceGroup.listResourceGroup()
+        return  JsonResponse(respdata)

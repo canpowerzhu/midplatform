@@ -104,6 +104,7 @@ def syncregion(resqBody):
 def syncall():
     res = instance.SyncRegion()
     regionlist = []
+    cmdbmodels.region.objects.all().delete()
     for value in res['Regions']['Region']:
         regionlist.append(
             cmdbmodels.region(regionId=value['RegionId'],
