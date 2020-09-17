@@ -135,3 +135,20 @@ class resourceGroup(models.Model):
     displayName = models.CharField(null=True,blank=True,max_length=100,verbose_name='资源组显示名称')
     createTime = models.DateTimeField(verbose_name='创建时间')
 
+# 账户成本
+class billDetail(models.Model):
+    item_choice=(
+        (0,'预付订单'),
+        (1,'后付账单'),
+        (2,'退款'),
+    )
+    accountId = models.BigIntegerField(verbose_name='所属账号ID')
+    accountName = models.CharField(max_length=300, verbose_name='账户名称')
+    item = models.IntegerField(choices=item_choice, verbose_name='账单类型 SubscriptionOrder (预付订单) PayAsYouGoBill (后付账单) Refund (退款)')
+    billingCycle = models.DateField(db_index=True,verbose_name='账单日期')
+    resourceGroup= models.CharField(max_length=100,verbose_name='资源组')
+    region = models.CharField(blank=True,null=True,max_length=200,verbose_name='所属region')
+    productDetail= models.CharField(max_length=100,verbose_name='产品明细')
+    productCode= models.CharField(max_length=100,verbose_name='产品明细code')
+    nickName= models.CharField(blank=True,null=True,max_length=100,verbose_name='实例昵称')
+    pretaxAmount= models.DecimalField(max_digits=10, decimal_places=5,verbose_name='应付金额')

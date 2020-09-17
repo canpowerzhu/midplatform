@@ -1,9 +1,9 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 
-import json, datetime
+import json
 from common import baseconfig
-from common.aliyun import instance
+
 from midplatform import settings
 
 accesskeyId = baseconfig.getconfig()['accessKey']
@@ -204,4 +204,16 @@ def resourceGroup(request):
     if request.method == 'GET' or request.method == 'get':
         # 罗列资产组
         respdata=resourceGroup.listResourceGroup()
+        return  JsonResponse(respdata)
+
+
+
+#账单相关
+def syncbill(request):
+    if request.method == 'post' or request.method == 'POST':
+        from common.aliyun import  bill
+        resqBody = json.loads(request.body.decode('utf-8'))
+        pagesize = resqBody['pagesize']
+        billingCycle = resqBody['billingCycle']
+        respdata = bill.getMonthBill(billingCycle,pagesize)
         return  JsonResponse(respdata)

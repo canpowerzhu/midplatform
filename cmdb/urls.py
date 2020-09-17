@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^asset/', views.asset),
     url(r'^eipinfo/', views.eipinfo),
     url(r'^resourceGroup/', views.resourceGroup),
+    url(r'^syncbill/', views.syncbill),
 ]
