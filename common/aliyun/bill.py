@@ -21,7 +21,7 @@ request = QueryInstanceBillRequest()
 request.set_accept_format('json')
 
 
-def getMonthBill(month,pagesize):
+def syncMonthBill(month,pagesize):
 
     if pagesize not in range(20,301):
         settings.RESULT['code'] = 2009
@@ -61,7 +61,6 @@ def insertBillDetail(pagesize,pagenum):
     request.set_PageNum(pagenum)
 
     response = json.loads(str(client.do_action_with_exception(request), encoding='utf-8'))
-    print(pagesize,pagenum)
     AccountID = response['Data']['AccountID']
     AccountName = response['Data']['AccountName']
     BillingCycle = response['Data']['BillingCycle'] + '-01'
@@ -87,5 +86,4 @@ def insertBillDetail(pagesize,pagenum):
                                                     nickName=getdata[i]['NickName'],
                                                     pretaxAmount=getdata[i]['PretaxAmount']
                                                     ))
-        print(billdetaillist)
     cmdbmodels.billDetail.objects.bulk_create(billdetaillist)

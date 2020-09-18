@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
-
+from django.db.models import Sum,Count
 import json
 from common import baseconfig
 
@@ -209,11 +209,27 @@ def resourceGroup(request):
 
 
 #账单相关
-def syncbill(request):
+def billmonth(request):
+    from common.aliyun import bill
     if request.method == 'post' or request.method == 'POST':
-        from common.aliyun import  bill
+
         resqBody = json.loads(request.body.decode('utf-8'))
         pagesize = resqBody['pagesize']
         billingCycle = resqBody['billingCycle']
-        respdata = bill.getMonthBill(billingCycle,pagesize)
+        respdata = bill.syncMonthBill(billingCycle,pagesize)
         return  JsonResponse(respdata)
+
+
+    if request.method == 'GET' or request.method == 'get':
+        groupname= request.GET.get('groupname', default='billingCycle')
+        if groupname == 'billingCycle':
+            res = cmdbmodels.billDetail.objects.values(groupname).annotate(Sum('pretaxAmount'))
+        else:
+            res = cmdbmodels.billDetail.objects.values(groupname,'billingCycle').annotate(Sum('pretaxAmount'))
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+        settings.RESULT['data'] = list(res)
+        settings.RESULT['count'] =res.count()
+        settings.RESULT['groupname'] = groupname
+
+        return JsonResponse(settings.RESULT)

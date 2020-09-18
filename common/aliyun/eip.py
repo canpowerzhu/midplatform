@@ -47,7 +47,7 @@ def buyEip(data):
 
 
     if data['chargeType'] == 1:
-        # type是1 则是预付费 包年包月类型
+        # chargeType 是1 则是预付费 包年包月类型
         print(data['period'])
         if  data['period']  not in range(1,9) or data['bandWidth'] not in range(1,1000):
             settings.RESULT['code'] = 2009
@@ -66,11 +66,12 @@ def buyEip(data):
 
 
     if data['chargeType'] == 0:
-        # type 0 是按量付费
-        if data['bandWidth'] not in range(1, 500)  or 'internetChargeType' not in data:
+        # chargeType 0 是按量付费
+        print(data['bandWidth'])
+        if data['bandWidth'] not in range(1, 500)  or 'internetChargeType'  not in data:
             settings.RESULT['code'] = 2009
             settings.RESULT['msg'] = 'fail'
-            settings.RESULT['data'] = '选择的购买时长(period)参数异常'
+            settings.RESULT['data'] = '(bandWidth取值区间[1,500],internetChargeType)参数异常'
             return settings.RESULT
         if data['internetChargeType'] == 0:
             internetChargeType = 'PayByBandwidth'

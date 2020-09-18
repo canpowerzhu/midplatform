@@ -217,7 +217,7 @@ def sysuser(request):
         id = int(request.get_full_path().split('?')[1].split('=')[1])
         import datetime
         deltime = datetime.datetime.now().strftime('%b-%d-%y %H:%M:%S')
-        models.sys_user.objects.filter(pk=id).update(deleted=deltime)
+        models.sys_user.objects.filter(pk=id).delete()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         return JsonResponse(settings.RESULT)
