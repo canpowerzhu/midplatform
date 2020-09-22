@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
-from django.db.models import Sum,Count
-import json
+from django.db.models import Sum, FloatField
+import json, datetime
 from common import baseconfig
 
 from midplatform import settings
@@ -11,6 +11,7 @@ accessSecret = baseconfig.getconfig()['accessSecret']
 
 from cmdb import models as cmdbmodels
 from django.core.paginator import Paginator
+
 
 # 可用区相关
 def region(request):
@@ -24,7 +25,6 @@ def region(request):
     """
 
     if request.method == 'GET' or request.method == 'get':
-
         res = list(cmdbmodels.region.objects.all().values())
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -32,7 +32,6 @@ def region(request):
         settings.RESULT['data'] = res
         return JsonResponse(settings.RESULT)
     if request.method == 'PUT' or request.method == 'put':
-
         res = json.loads(request.body.decode('utf-8'))
         cmdbmodels.region.objects.filter(pk=int(res['id'])).update(humanName=res['humanName'])
         settings.RESULT['code'] = 2001
@@ -53,10 +52,11 @@ def region(request):
         resqBody = json.loads(request.body.decode('utf-8'))
         from common.aliyun import region
         if resqBody['type'] == 0:
-            res =region.syncregion(resqBody)
+            res = region.syncregion(resqBody)
         else:
             res = region.syncall()
         return JsonResponse(res)
+
 
 # 资产组相关
 def assetgroup(request):
@@ -96,10 +96,9 @@ def assetgroup(request):
         settings.RESULT['data'] = res
         return JsonResponse(settings.RESULT)
 
+
 # 资产实例
 def asset(request):
-
-
     ## 此接口主要用于实例的启动停止 重启功能
     if request.method == 'PUT' or request.method == 'put':
         # 获取要进行的实例的动作 0 - stop 1-start 2-restart
@@ -112,7 +111,6 @@ def asset(request):
         if not res.exists():
             settings.RESULT['code'] = 2009
             settings.RESULT['msg'] = 'fail'
-
 
         cur_ecs_status = res.values('status').first()['status']
         # 如果停止0  必须状态为running  0
@@ -134,19 +132,17 @@ def asset(request):
         return JsonResponse(settings.RESULT)
 
     if request.method == 'GET' or request.method == 'get':
-
         limit = request.GET.get('limit')
         page = request.GET.get('page')
         res = cmdbmodels.asset.objects.all().values()
         assetlist = Paginator(res, limit)  # 进行分页
-        page_asset= assetlist.page(page)  # 返回对应页码
+        page_asset = assetlist.page(page)  # 返回对应页码
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['data'] = list(page_asset)
         settings.RESULT['count'] = res.count()
 
-        return  JsonResponse(settings.RESULT)
-
+        return JsonResponse(settings.RESULT)
 
 
 # 弹性IP
@@ -155,24 +151,24 @@ def asset(request):
 
 def eipinfo(request):
     if request.method == 'post' or request.method == 'POST':
-        from common.aliyun import  eip
+        from common.aliyun import eip
         actionType = {
-            0: eip.syncEip, # 同步对应region 的弹性IP
-            1: eip.buyEip, # 购买EIP
-            2: eip.associateEip, # 绑定EIP
-            3: eip.unassociateEip, # 解绑EIP
-            4: eip.releaseEip, # 释放EIP
-            5: eip.modifyEip # 升级更新EIP
+            0: eip.syncEip,  # 同步对应region 的弹性IP
+            1: eip.buyEip,  # 购买EIP
+            2: eip.associateEip,  # 绑定EIP
+            3: eip.unassociateEip,  # 解绑EIP
+            4: eip.releaseEip,  # 释放EIP
+            5: eip.modifyEip  # 升级更新EIP
         }
         resbody = json.loads(request.body.decode('utf-8'))
         actionTypeInt = resbody['type']
-        respData = actionType[actionTypeInt](resbody) # 这是去执行对应的方法
-        return  JsonResponse(respData)
+        respData = actionType[actionTypeInt](resbody)  # 这是去执行对应的方法
+        return JsonResponse(respData)
 
     if request.method == 'get' or request.method == 'GET':
         data = cmdbmodels.eip.objects.all().values()
-        limit = request.GET.get('limit',default=10)
-        page = request.GET.get('page',default=1)
+        limit = request.GET.get('limit', default=10)
+        page = request.GET.get('page', default=1)
 
         assetlist = Paginator(data, limit)  # 进行分页
         page_asset = assetlist.page(page)  #
@@ -181,8 +177,7 @@ def eipinfo(request):
         settings.RESULT['msg'] = 'success'
         settings.RESULT['data'] = list(page_asset)
         settings.RESULT['count'] = count
-        return  JsonResponse(settings.RESULT)
-
+        return JsonResponse(settings.RESULT)
 
 
 # 资产组
@@ -203,33 +198,98 @@ def resourceGroup(request):
 
     if request.method == 'GET' or request.method == 'get':
         # 罗列资产组
-        respdata=resourceGroup.listResourceGroup()
-        return  JsonResponse(respdata)
+        respdata = resourceGroup.listResourceGroup()
+        return JsonResponse(respdata)
 
 
-
-#账单相关
+# 账单相关
 def billmonth(request):
     from common.aliyun import bill
     if request.method == 'post' or request.method == 'POST':
-
         resqBody = json.loads(request.body.decode('utf-8'))
         pagesize = resqBody['pagesize']
         billingCycle = resqBody['billingCycle']
-        respdata = bill.syncMonthBill(billingCycle,pagesize)
-        return  JsonResponse(respdata)
+        respdata = bill.syncMonthBill(billingCycle, pagesize)
+        return JsonResponse(respdata)
+
 
 
     if request.method == 'GET' or request.method == 'get':
-        groupname= request.GET.get('groupname', default='billingCycle')
-        if groupname == 'billingCycle':
-            res = cmdbmodels.billDetail.objects.values(groupname).annotate(Sum('pretaxAmount'))
+        import datetime
+        dt = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m"), "%Y-%m")
+        defaultPeriod = dt.replace(month=dt.month - 1).strftime("%Y-%m")
+
+
+        # 账单时间
+        billingPeriod = request.GET.get('billingPeriod')
+        if billingPeriod:
+            period = billingPeriod
         else:
-            res = cmdbmodels.billDetail.objects.values(groupname,'billingCycle').annotate(Sum('pretaxAmount'))
+            period = defaultPeriod
+
+        # 获取依据groupname 判断业务类型
+        groupBy = request.GET.get('groupname')
+
+        if groupBy :
+            print("有区别 类型是 %s" %groupBy)
+            groupName = groupBy
+            res = cmdbmodels.billDetail.objects.filter(billingCycle=period+'-01').values(groupName).annotate(
+                        total=Sum('pretaxAmount', output_field=FloatField()))
+            settings.RESULT['data'] = list(res)
+            settings.RESULT['count'] = res.count()
+
+        else:
+
+            groupName = 'billingCycle'
+            # 这是获取近六个月的账单,用于柱状图
+            endDate = datetime.datetime.strptime(period , "%Y-%m")
+            if endDate.month <= 5:
+                month = endDate.month + 7
+                year = endDate.year - 1
+                startDate = datetime.date(year, month, 1).strftime('%Y-%m')
+            else:
+                startDate = endDate.replace(month=endDate.month - 5).strftime("%Y-%m")
+
+            period = startDate+ '至' + endDate.strftime("%Y-%m")
+            # 获取数据
+            res = cmdbmodels.billDetail.objects.filter(billingCycle__gte=startDate+'-01').filter(
+                billingCycle__lte=endDate.strftime("%Y-%m-%d")).values('billingCycle').annotate(
+                total=Sum('pretaxAmount', output_field=FloatField()))
+            finallist=[]
+            for i in range(res.count()):
+                tempdate=list(res)[i]['billingCycle']
+                tempres = cmdbmodels.billDetail.objects.filter(billingCycle=tempdate).values('productDetail').annotate(subtotal=Sum('pretaxAmount', output_field=FloatField()))
+                list(res)[i]['data'] = list(tempres)
+                print(list(res)[i])
+            settings.RESULT['data'] = list(res)
+            settings.RESULT['count'] = res.count()
+
+
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+        settings.RESULT['period'] = period
+        settings.RESULT['groupname'] = groupName
+
+        return JsonResponse(settings.RESULT)
+
+
+# 账单相关
+def billmonthV2(request):
+    from common.aliyun import bill
+
+    if request.method == 'GET' or request.method == 'get':
+        groupname = request.GET.get('groupname', default='billingCycle')
+        if groupname == 'billingCycle':
+            res = cmdbmodels.billDetail.objects.values(groupname).annotate(total=Sum('pretaxAmount'))
+        else:
+            res = cmdbmodels.billDetail.objects.values(groupname, 'billingCycle').annotate(total=Sum('pretaxAmount'))
+
+        # legend = cmdbmodels.billDetail.objects.distinct('productDetail')
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['data'] = list(res)
-        settings.RESULT['count'] =res.count()
+        # settings.RESULT['lenged'] = list(legend)
+        settings.RESULT['count'] = res.count()
         settings.RESULT['groupname'] = groupname
 
         return JsonResponse(settings.RESULT)
