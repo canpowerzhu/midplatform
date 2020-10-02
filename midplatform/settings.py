@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'project.apps.ProjectConfig',
     'sysconf.apps.SysconfConfig',
     'mophealth.apps.MophealthConfig',
- 'cmdb.apps.CmdbConfig',
+    'cmdb.apps.CmdbConfig',
 
 ]
 
@@ -60,6 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
+
 ]
 
 ROOT_URLCONF = 'midplatform.urls'
@@ -171,6 +173,7 @@ codeMsg = {
     2008: '请求域名，无任何解析',
     2009: '失败',
     20091: '重复提交',
+
 }
 
 
@@ -194,4 +197,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
 
 
 
+operateType={
+    0:"增加",
+    1:"删除",
+    2:"修改"
+}
 

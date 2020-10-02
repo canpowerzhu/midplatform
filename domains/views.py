@@ -1,15 +1,12 @@
-from django.shortcuts import render, HttpResponse
 from django.http import HttpResponse, JsonResponse
-# from django.conf import settings
 from midplatform import  settings
 from domains import models
-import json
-import requests
+import json,requests
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkdomain.request.v20180129.QueryDomainListRequest import QueryDomainListRequest
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
 from django.core.paginator import Paginator
-from django.forms.models import model_to_dict
+from common.logconf import  get_log_insert
 
 #### 域名接口
 s = requests.session()
@@ -153,8 +150,12 @@ def modifyaccount(request):
             status = '1'
         else:
             status = '0'
+
+        origindata = list(models.Domainaccount.objects.filter(pk=id).values('username','status'))[0]
         is_ok = models.Domainaccount.objects.filter(pk=id).update(status=status)
         if is_ok == 1:
+            info = '域名账户' + origindata['username'] + '状态由' + origindata['status'] + '变成' + status
+            get_log_insert.logrecord(1,request,{'msg':info})
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'success'
         else:
@@ -177,7 +178,7 @@ def domainsync(request):
     id = request.GET.get('id')
     registerType = list(models.Domainaccount.objects.filter(pk=id).values_list('register_website',flat=True))[0]
     if registerType == 'www.aliyun.com':
-        if aliyundomainsync(id):
+        if aliyundomainsync(id,request):
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'successs'
             settings.RESULT['data'] = settings.codeMsg[2001]
@@ -188,11 +189,11 @@ def domainsync(request):
     account_token = list(models.Domainaccount.objects.filter(pk=id).values_list('username','token').first())
     account = account_token[0]
     token = account_token[1]
-    print(account_token)
     s.auth = (account, token)
     res = s.get(url=api_url)
     if res.status_code == 200:
         domainresult = res.content.decode('utf-8')
+
         if 'domains' in domainresult:
             data = json.loads(domainresult)['domains']
             ###利用bulk_create进行批量插入
@@ -217,7 +218,8 @@ def domainsync(request):
             settings.RESULT['msg'] = 'fail'
             settings.RESULT['data'] = settings.codeMsg[2008]
             return JsonResponse(settings.RESULT)
-
+        info = '域名账号' + account + '同步域名总共' + str(len(data))
+        get_log_insert.logrecord(1,request,{'msg':info})
         models.Domainlist.objects.filter(name_account=account).delete()
         models.Domainlist.objects.bulk_create(domain_obj_list)
         settings.RESULT['code'] = 2001
@@ -261,7 +263,7 @@ def recordinfo(s, api_url, domian, username):
 
 #### 阿里云域名相关同步
 
-def aliyundomainsync(id):
+def aliyundomainsync(id,requestinfo):
     resdata = list(models.Domainaccount.objects.filter(pk=id).values_list('token_name', 'account_code','username').first())
     accessKeyId = resdata[0]
     accessSecret = resdata[1]
@@ -290,6 +292,8 @@ def aliyundomainsync(id):
         ))
     models.Domainlist.objects.filter(name_account=username).delete()
     models.Domainlist.objects.bulk_create(domainlist)
+    info = '域名账号' + username + '同步域名总共' + str(len(data))
+    get_log_insert.logrecord(1, requestinfo, {'msg': info})
     return True
 
 

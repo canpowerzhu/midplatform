@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse,HttpResponseRedirect
 from sysconf import models
 from midplatform import settings
 from django.forms.models import model_to_dict
@@ -6,6 +6,7 @@ import json
 from django.core.paginator import Paginator
 from django.db.models import Q
 from common import ossupload, midplatformcrypt, tokenserver
+from common.logconf import  get_log_insert
 
 isLogin = tokenserver.isLogin
 
@@ -394,7 +395,6 @@ def sysuserlogin(request):
         return JsonResponse({'code': 2003, 'msg': 'fail', 'data': '用户不存在'})
 
     dbPassword = model_to_dict(models.sys_user.objects.filter(username=param_dict['username']).first())['password']
-    print(dbPassword, originPassword)
     if originPassword == dbPassword:
         info = model_to_dict(models.sys_user.objects.get(username=param_dict['username']))
         info['password'] = Aescrypt(info['password'], 0)['jiami']
@@ -411,14 +411,18 @@ def sysuserlogin(request):
         permissions = models.sys_menu.objects.filter(id__in=user_persssions_id).values_list('code', flat=True)
 
         from common import tokenserver
-        access_token = tokenserver.create_token(param_dict['username'])
+
+        access_token,traceId = tokenserver.create_token(param_dict['username'])
         settings.loginDic['access_token'] = access_token
         settings.loginDic['expires_in'] = 18000
         settings.loginDic['permissions'] = list(permissions)
         settings.loginDic['roles'] = list(roles)
         settings.loginDic['info'] = info
-        # print(settings.loginDic)
+        # 传入参数 0 登陆相关日志
+
+        get_log_insert.logrecord(0,request, {'username':param_dict['username'],'action':1,'status':1,'traceId':traceId})
         return JsonResponse({'code': 2001, 'msg': 'success', 'data': settings.loginDic})
+    get_log_insert.logrecord(0, request, {'username': param_dict['username'], 'action':1,'status':0})
     return JsonResponse({'code': 2004, 'msg': 'fail', 'data': '密码错误'})
 
 
@@ -448,3 +452,19 @@ def deployuser(request):
     settings.RESULT['data'] = list(res)
     print(settings.RESULT)
     return JsonResponse(settings.RESULT)
+
+
+def logout(request):
+    if request.method == 'DELETE' or request.method == 'delete':
+        key = request.META['HTTP_AUTHORIZATION']
+        print(key)
+        # 一定要先获取 再clean
+        traceId = tokenserver.get_traceId(key)
+        username = tokenserver.clean_token(key)
+
+
+        print(traceId)
+        get_log_insert.logrecord(0, request, {  'action': 0,'status': 1,'username': username,'traceId':traceId})
+        return HttpResponseRedirect("/sysconf/sysuserlogin/")
+
+

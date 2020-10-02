@@ -23,28 +23,29 @@ def getallrecord(request):
     limit = int(request.GET.get('limit', default=10))
     page = int(request.GET.get('page', default=1))
 
-    projectName = request.GET.get('projectName')
-    publisher = request.GET.get('publisher')
-    state = request.GET.get('state')
+    projectName = request.GET.get('projectName', None)
+    publisher = request.GET.get('publisher', None)
+    state = request.GET.get('state', None)
 
-    if publisher != None and projectName != None:
+    fetch = models.deployRecord.objects.all()
+    if publisher and projectName:
         kwargs['publisher'] = publisher
         kwargs['projectName'] = projectName
 
-    elif projectName != None:
+    elif projectName:
         kwargs['projectName'] = projectName
 
-    elif state != None:
+    elif state:
         kwargs['state'] = state
 
-    elif publisher != None:
-        kwargs['Publisher'] = publisher
-    else:
-        count = models.deployRecord.objects.filter(**kwargs).count()
-        res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime').values()
+    elif publisher:
 
-    count = models.deployRecord.objects.filter(**kwargs).count()
-    res = models.deployRecord.objects.filter(**kwargs).order_by('-deployTime').values()
+        kwargs['publisher'] = publisher
+    else:
+        pass
+
+    res = fetch.filter(**kwargs).order_by('-deployTime').values()
+    count = res.count()
 
     # 每页显示10条记录
     paginator = Paginator(res, limit)
@@ -94,7 +95,7 @@ def addrecord(request):
         kwargs['publisher'] = res['publisher']
 
         models.deployRecord.objects.create(**kwargs)
-        get_res= models.deployRecord.objects.all().aggregate(Max('id'))
+        get_res = models.deployRecord.objects.all().aggregate(Max('id'))
 
         front_respone = {'code': 2001, 'msg': None}
         front_respone['msg'] = 'success'
@@ -175,7 +176,8 @@ def dingrecord(request):
         dingstep = int(res['dingStep'])  # dingstep  1 测试 2 审核 3 运维
         id = int(res['id'])
         dingcontent = models.deployRecord.objects.filter(pk=id).values('projectName', 'tester').first()
-        data = {'id':id,'tester': dingcontent['tester'], 'dingstep': dingstep, 'projectName': dingcontent['projectName']}
+        data = {'id': id, 'tester': dingcontent['tester'], 'dingstep': dingstep,
+                'projectName': dingcontent['projectName']}
         dingtalkmsg(data, 9)
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -209,7 +211,7 @@ def dingtalkmsg(data, type):
     from sysconf import models as  sysmol
     dowithbaseurl = baseconfig.getconfig()['dowithurl']
     print(data)
-    url = dowithbaseurl + '?id='+ str(data['id'])
+    url = dowithbaseurl + '?id=' + str(data['id'])
     # print(url)
     testnum = sysmol.sys_user.objects.filter(nickname=data['tester']).values('phone').first()['phone']
     ownerNum = sysmol.sys_user.objects.filter(id=int(idList['projectOwnerId'])).values('phone').first()['phone']

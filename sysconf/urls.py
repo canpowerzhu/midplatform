@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^mailserver/', views.mailserver),
     url(r'^getrouter/', views.getrouter),
     url(r'^sysuser/', views.sysuser),
-    url(r'^sysuser/', views.sysuser),
+    url(r'^logout/', views.logout),
     url(r'^setPassword/', views.setPassword),
     url(r'^sysRole/', views.sysRole),
     url(r'^sysRoleSelect/', views.sysRoleSelect),

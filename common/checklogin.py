@@ -23,7 +23,23 @@ def keyExists(key):
     return res
 
 
+def getNameByToken(key):
+    res= r.get(key)
+
+    resdata= res.split('|')[0]
+    return  resdata
 
 
 
+# 用于登出 去清理token
+def clearToken(key):
+    respdata = r.get(key).split('|')[0]
+    res= r.delete(key)
+    print(res,respdata)
+    return  respdata
 
+def getTranceIdByToken(key):
+    # 根据token 获取traceID
+    res= r.get(key).split('|')[1]
+    print(res)
+    return  res

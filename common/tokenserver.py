@@ -3,12 +3,14 @@
 # @Software: PyCharm
 from django.http import JsonResponse
 from common import baseconfig
+import uuid
 TIME_OUT = baseconfig.getconfig()['redisToeknExpire'].rstrip()
 import re
 TIME_OUT = int(re.sub("\D", "", TIME_OUT))
 
 from common import checklogin
 from midplatform import settings
+
 
 
 def isLogin(func):
@@ -31,15 +33,24 @@ def create_token(username):
     t = itsdangerous.TimedJSONWebSignatureSerializer(salt,expires_in=TIME_OUT)
     res = t.dumps({'username':username})
     token = res.decode()
-
-    checklogin.keyset(k=token, v=username, expire=TIME_OUT)
-    return  token
+    traceId = str(uuid.uuid1())
+    kvalue = username+'|'+ traceId
+    print(token,kvalue,TIME_OUT)
+    checklogin.keyset(k=token, v=kvalue, expire=TIME_OUT)
+    return  token,traceId
 
 def get_token(token):
     t = itsdangerous.TimedJSONWebSignatureSerializer(salt, expires_in=TIME_OUT)
     user = t.loads(token)
     return user
 
+def get_traceId(token):
+    res = checklogin.getTranceIdByToken(token)
+    return  res
+
+def clean_token(token):
+    username = checklogin.clearToken(token)
+    return username
 
 
 

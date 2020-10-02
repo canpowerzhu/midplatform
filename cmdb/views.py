@@ -1,15 +1,15 @@
-from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.db.models import Sum, FloatField
-import json, datetime
+import json
 from common import baseconfig
-
+from common.logconf import  get_log_insert
 from midplatform import settings
+from cmdb import models as cmdbmodels
 
 accesskeyId = baseconfig.getconfig()['accessKey']
 accessSecret = baseconfig.getconfig()['accessSecret']
 
-from cmdb import models as cmdbmodels
+
 from django.core.paginator import Paginator
 
 
@@ -33,6 +33,7 @@ def region(request):
         return JsonResponse(settings.RESULT)
     if request.method == 'PUT' or request.method == 'put':
         res = json.loads(request.body.decode('utf-8'))
+        get_log_insert.logrecord(1, request, {'msg': '修改本地region,格式化名' + res['humanName']})
         cmdbmodels.region.objects.filter(pk=int(res['id'])).update(humanName=res['humanName'])
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -40,7 +41,6 @@ def region(request):
         return JsonResponse(settings.RESULT)
 
     if request.method != 'POST':
-        # if request.method != 'post' or request.method != 'POST':
         settings.RESULT['code'] = 405
         settings.RESULT['msg'] = 'fail'
         settings.RESULT['data'] = '请使用post请求'
@@ -52,7 +52,10 @@ def region(request):
         resqBody = json.loads(request.body.decode('utf-8'))
         from common.aliyun import region
         if resqBody['type'] == 0:
+
             res = region.syncregion(resqBody)
+            info = "同步可用区 [" + resqBody['regionId'] + "] 下面的所有实例"
+            get_log_insert.logrecord(1,request, {'msg': info} )
         else:
             res = region.syncall()
         return JsonResponse(res)
@@ -61,17 +64,22 @@ def region(request):
 # 资产组相关
 def assetgroup(request):
     # 定义空字典
-    kwargs = {}
     if request.method == 'POST' or request.method == 'post':
+
         res = json.loads(request.body.decode('utf-8'))
+
         try:
             object, created = cmdbmodels.assetGroup.objects.update_or_create(name=res['name'],
                                                                              defaults={'name': res['name'],
                                                                                        'comment': res['comment']})
             if created:
                 settings.RESULT['data'] = '新增成功'
+                info = "新增资产组 [" + res['name'] + "]"
+
             else:
+                info = "修改资产组 [" + res['name'] + "]"
                 settings.RESULT['data'] = '修改成功'
+            get_log_insert.logrecord(1, request, {'msg': info})
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'success'
         except Exception as e:
@@ -83,6 +91,9 @@ def assetgroup(request):
 
     if request.method == 'DELETE' or request.method == 'delete':
         delid = request.GET.get('id')
+        regionGroupName = cmdbmodels.assetGroup.objects.filter(pk=int(delid)).values['name']
+        info = "删除资产组 [" + regionGroupName  + "]"
+        get_log_insert.logrecord(1, request, {'msg': info})
         cmdbmodels.assetGroup.objects.filter(pk=int(delid)).delete()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
@@ -94,6 +105,17 @@ def assetgroup(request):
         settings.RESULT['msg'] = 'success'
         settings.RESULT['count'] = len(res)
         settings.RESULT['data'] = res
+        return JsonResponse(settings.RESULT)
+
+    if request.method == 'PUT' or request.method == 'put':
+        res = json.loads(request.body.decode('utf-8'))
+        orginInfo = list(cmdbmodels.assetGroup.objects.filter(pk=res['id']).values())[0]
+        info = "变更资产组 由" + str(orginInfo) + " 更改为" +  str(res)
+        get_log_insert.logrecord(1, request, {'msg': info})
+        cmdbmodels.assetGroup.objects.filter(pk=res['id']).update(name=res['name'],comment=res['comment'])
+        settings.RESULT['code'] = 2001
+        settings.RESULT['msg'] = 'success'
+
         return JsonResponse(settings.RESULT)
 
 
@@ -119,6 +141,8 @@ def asset(request):
                 action == 2 and cur_ecs_status == 0):
             # modifyres = instance.InstanceStatus(res.values('regionId').first()['regionId'], InstanceId, action)
             # 上述完成后我们要去更新数据库数据
+            info = "实例" + InstanceId +  "状态更改为" + action
+            get_log_insert.logrecord(1, request, {'msg': info})
             print(InstanceId, action)
             # cmdbmodels.asset.objects.filter(instanceId=InstanceId).update(status=modifyres)
             settings.RESULT['code'] = 2001
@@ -204,37 +228,42 @@ def resourceGroup(request):
 
 # 账单相关
 def billmonth(request):
+
     from common.aliyun import bill
     if request.method == 'post' or request.method == 'POST':
         resqBody = json.loads(request.body.decode('utf-8'))
         pagesize = resqBody['pagesize']
         billingCycle = resqBody['billingCycle']
         respdata = bill.syncMonthBill(billingCycle, pagesize)
+        info = "同步" + billingCycle  + "的账单"
+        get_log_insert.logrecord(1, request, {'msg': info})
         return JsonResponse(respdata)
 
 
 
     if request.method == 'GET' or request.method == 'get':
+        # get_log_insert.logrecord(1,request,{'msg':'拉取账单'})
+
         import datetime
         dt = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m"), "%Y-%m")
         defaultPeriod = dt.replace(month=dt.month - 1).strftime("%Y-%m")
-
-
+        print(defaultPeriod)
         # 账单时间
         billingPeriod = request.GET.get('billingPeriod')
         if billingPeriod:
-            period = billingPeriod
+            allperiod = billingPeriod
         else:
-            period = defaultPeriod
+            allperiod = defaultPeriod
 
         # 获取依据groupname 判断业务类型
         groupBy = request.GET.get('groupname')
 
         if groupBy :
-            print("有区别 类型是 %s" %groupBy)
             groupName = groupBy
-            res = cmdbmodels.billDetail.objects.filter(billingCycle=period+'-01').values(groupName).annotate(
-                        total=Sum('pretaxAmount', output_field=FloatField()))
+            print(groupName)
+            res = cmdbmodels.billDetail.objects.filter(billingCycle=allperiod+'-01').values(groupName).annotate(
+                        total=Sum('pretaxAmount', output_field=FloatField())).order_by('-total')
+            print(res)
             settings.RESULT['data'] = list(res)
             settings.RESULT['count'] = res.count()
 
@@ -242,7 +271,7 @@ def billmonth(request):
 
             groupName = 'billingCycle'
             # 这是获取近六个月的账单,用于柱状图
-            endDate = datetime.datetime.strptime(period , "%Y-%m")
+            endDate = datetime.datetime.strptime(allperiod , "%Y-%m")
             if endDate.month <= 5:
                 month = endDate.month + 7
                 year = endDate.year - 1
@@ -250,46 +279,30 @@ def billmonth(request):
             else:
                 startDate = endDate.replace(month=endDate.month - 5).strftime("%Y-%m")
 
-            period = startDate+ '至' + endDate.strftime("%Y-%m")
+            allperiod = startDate+ '至' + endDate.strftime("%Y-%m")
             # 获取数据
-            res = cmdbmodels.billDetail.objects.filter(billingCycle__gte=startDate+'-01').filter(
-                billingCycle__lte=endDate.strftime("%Y-%m-%d")).values('billingCycle').annotate(
-                total=Sum('pretaxAmount', output_field=FloatField()))
-            finallist=[]
-            for i in range(res.count()):
-                tempdate=list(res)[i]['billingCycle']
-                tempres = cmdbmodels.billDetail.objects.filter(billingCycle=tempdate).values('productDetail').annotate(subtotal=Sum('pretaxAmount', output_field=FloatField()))
-                list(res)[i]['data'] = list(tempres)
-                print(list(res)[i])
-            settings.RESULT['data'] = list(res)
-            settings.RESULT['count'] = res.count()
+            daterange = cmdbmodels.billDetail.objects.filter(billingCycle__gte=startDate+'-01').filter(
+                billingCycle__lte=endDate.strftime("%Y-%m-%d")).values('billingCycle').distinct()
+
+            finallist = []
+            for i in range(daterange.count()):
+                period = list(daterange)[i]['billingCycle']
+                perdata = cmdbmodels.billDetail.objects.filter(billingCycle=list(daterange)[i]['billingCycle']).values('productDetail').annotate(subtotal=Sum('pretaxAmount', output_field=FloatField()))
+                for j in range(perdata.count()):
+                    #组装数据格式
+                    list(perdata)[j]['period'] =  period.strftime("%Y-%m")
+                    finallist.append(perdata[j])
+
+            settings.RESULT['data'] = finallist
+            settings.RESULT['count'] = len(finallist)
 
 
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
-        settings.RESULT['period'] = period
+        settings.RESULT['period'] = allperiod
         settings.RESULT['groupname'] = groupName
 
         return JsonResponse(settings.RESULT)
 
 
-# 账单相关
-def billmonthV2(request):
-    from common.aliyun import bill
 
-    if request.method == 'GET' or request.method == 'get':
-        groupname = request.GET.get('groupname', default='billingCycle')
-        if groupname == 'billingCycle':
-            res = cmdbmodels.billDetail.objects.values(groupname).annotate(total=Sum('pretaxAmount'))
-        else:
-            res = cmdbmodels.billDetail.objects.values(groupname, 'billingCycle').annotate(total=Sum('pretaxAmount'))
-
-        # legend = cmdbmodels.billDetail.objects.distinct('productDetail')
-        settings.RESULT['code'] = 2001
-        settings.RESULT['msg'] = 'success'
-        settings.RESULT['data'] = list(res)
-        # settings.RESULT['lenged'] = list(legend)
-        settings.RESULT['count'] = res.count()
-        settings.RESULT['groupname'] = groupname
-
-        return JsonResponse(settings.RESULT)

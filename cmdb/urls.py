@@ -15,5 +15,4 @@ urlpatterns = [
     url(r'^eipinfo/', views.eipinfo),
     url(r'^resourceGroup/', views.resourceGroup),
     url(r'^billmonth/', views.billmonth),
-    url(r'^billmonthV2/', views.billmonthV2),
 ]

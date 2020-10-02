@@ -13,12 +13,6 @@ def getapklist(request):
     limit = int(request.GET.get('limit', default=10))
     page = int(request.GET.get('page', default=1))
     envType = request.GET.get('envType')
-    # if page == 1:
-    #     start = 0
-    #     stop = limit
-    # else:
-    #     start = (page - 1) * limit
-    #     stop = limit * page
 
     if envType != None :
         res = models.apklist.objects.filter(envType=envType).values()
@@ -67,7 +61,43 @@ def upload(request):
                                           owner=owner,
                                           url=str(url))
             finaldata = {'code': 2001, 'msg': 'success'}
-    return JsonResponse(finaldata)
+            return JsonResponse(finaldata)
+
+
+
+
+# 日志模块
+def logrecord(request):
+    if request.method == 'GET' or request.method == 'get':
+
+        limit = int(request.GET.get('limit', default=10))
+        page = int(request.GET.get('page', default=1))
+        logtype = int(request.GET.get('logtype'))
+        print(logtype,type(logtype))
+        logtypedic={
+            0:models.login_out, #参数logtype 为0 是登陆登出日志
+            1:models.operatelog #参数logtype 为1 是操作日志
+        }
+        try:
+            res=logtypedic[logtype].objects.all().values().order_by('-requestTime')
+            print(res)
+            paginator = Paginator(res, limit)
+            # 获取第2页的数据
+            pageData = paginator.page(page)
+            records = list(pageData)
+            print(list(res))
+            settings.RESULT['code'] = 2001
+            settings.RESULT['msg'] = 'success'
+            settings.RESULT['data'] = records
+            settings.RESULT['count'] = res.count()
+        except Exception as e:
+            settings.RESULT['code'] = 2009
+            settings.RESULT['msg'] = 'fail'
+        return JsonResponse(settings.RESULT)
+
+
+
+
 
 
 
