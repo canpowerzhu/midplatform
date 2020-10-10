@@ -73,19 +73,16 @@ def logrecord(request):
         limit = int(request.GET.get('limit', default=10))
         page = int(request.GET.get('page', default=1))
         logtype = int(request.GET.get('logtype'))
-        print(logtype,type(logtype))
         logtypedic={
             0:models.login_out, #参数logtype 为0 是登陆登出日志
             1:models.operatelog #参数logtype 为1 是操作日志
         }
         try:
             res=logtypedic[logtype].objects.all().values().order_by('-requestTime')
-            print(res)
             paginator = Paginator(res, limit)
             # 获取第2页的数据
             pageData = paginator.page(page)
             records = list(pageData)
-            print(list(res))
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'success'
             settings.RESULT['data'] = records

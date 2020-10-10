@@ -70,3 +70,13 @@ def removeResourceGroup():
 # 加入资产组
 def joinResourceGroup():
     pass
+
+
+# 罗列资产
+def assetForReourceGroup():
+    res = cmdbmodels.asset.objects.all().values('id','instanceId','instanceName')
+    settings.RESULT['code'] = 2001
+    settings.RESULT['msg'] = 'success'
+    settings.RESULT['count'] = res.count()
+    settings.RESULT['data'] = list(res)
+    return settings.RESULT

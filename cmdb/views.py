@@ -91,7 +91,7 @@ def assetgroup(request):
 
     if request.method == 'DELETE' or request.method == 'delete':
         delid = request.GET.get('id')
-        regionGroupName = cmdbmodels.assetGroup.objects.filter(pk=int(delid)).values['name']
+        regionGroupName = cmdbmodels.assetGroup.objects.filter(pk=int(delid)).values().first()['name']
         info = "删除资产组 [" + regionGroupName  + "]"
         get_log_insert.logrecord(1, request, {'msg': info})
         cmdbmodels.assetGroup.objects.filter(pk=int(delid)).delete()
@@ -215,10 +215,19 @@ def resourceGroup(request):
             0: resourceGroup.syncResourceGroup,
             1: resourceGroup.joinResourceGroup,
             2: resourceGroup.removeResourceGroup,
+            3: resourceGroup.assetForReourceGroup,
         }
+
         reqBody = json.loads(request.body.decode('utf-8'))
-        respData = actionType[reqBody['type']]()
-        return JsonResponse(respData)
+        if reqBody['type'] in actionType.keys():
+            respData = actionType[reqBody['type']]()
+
+            return JsonResponse(respData)
+        else:
+            settings.RESULT['code'] = 2009
+            settings.RESULT['msg'] = 'fail'
+            settings.RESULT['data'] = 'type；类型不存在'
+            return  JsonResponse(settings.RESULT)
 
     if request.method == 'GET' or request.method == 'get':
         # 罗列资产组
@@ -247,23 +256,32 @@ def billmonth(request):
         import datetime
         dt = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m"), "%Y-%m")
         defaultPeriod = dt.replace(month=dt.month - 1).strftime("%Y-%m")
-        print(defaultPeriod)
+        lastPeriod = dt.replace(month=dt.month - 2).strftime("%Y-%m")
+
         # 账单时间
         billingPeriod = request.GET.get('billingPeriod')
         if billingPeriod:
             allperiod = billingPeriod
         else:
             allperiod = defaultPeriod
-
+            lastPeriod = lastPeriod
         # 获取依据groupname 判断业务类型
         groupBy = request.GET.get('groupname')
-
         if groupBy :
+            # 用于饼状图和table图
             groupName = groupBy
-            print(groupName)
-            res = cmdbmodels.billDetail.objects.filter(billingCycle=allperiod+'-01').values(groupName).annotate(
-                        total=Sum('pretaxAmount', output_field=FloatField())).order_by('-total')
-            print(res)
+            if groupName == 'resourceGroup':
+                res = cmdbmodels.billDetail.objects.filter(billingCycle=allperiod+'-01').values('resourceGroup','billingCycle').annotate(
+                            total=Sum('pretaxAmount', output_field=FloatField())).order_by('-total')
+
+                for i in list(res):
+                    lastcost = cmdbmodels.billDetail.objects.filter(resourceGroup=i['resourceGroup'],billingCycle=lastPeriod+'-01').aggregate(nums=Sum('pretaxAmount',output_field=FloatField()))
+                    i['lastcost'] = lastcost['nums']
+                    i['rate'] = round((i['total'] - lastcost['nums'])/lastcost['nums'],2)
+
+            elif groupName == 'productDetail':
+                res = cmdbmodels.billDetail.objects.filter(billingCycle=allperiod + '-01').values('productDetail','billingCycle').annotate(
+                    total=Sum('pretaxAmount', output_field=FloatField())).order_by('-total')
             settings.RESULT['data'] = list(res)
             settings.RESULT['count'] = res.count()
 

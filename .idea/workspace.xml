@@ -3,23 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="7b022e7d-0758-4bb2-9231-9594f282b774" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/cmdb/migrations/0002_auto_20200917_2102.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/logconf/get_log_insert.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/component/migrations/0002_login_out_operatelog.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmdb/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/cmdb/migrations/0001_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmdb/migrations/0002_asset_group_region.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmdb/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/cmdb/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmdb/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/cmdb/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/checklogin.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/checklogin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/tokenserver.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/tokenserver.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/component/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/component/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/component/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/component/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/aliyun/resourceGroup.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/aliyun/resourceGroup.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/component/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/component/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/deploy/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/deploy/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/domains/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/domains/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/midplatform/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/midplatform/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sysconf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sysconf/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/sysconf/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -290,7 +280,9 @@
       <workItem from="1600954021743" duration="18273000" />
       <workItem from="1601262570797" duration="6658000" />
       <workItem from="1601367278961" duration="3672000" />
-      <workItem from="1601427788143" duration="17975000" />
+      <workItem from="1601427788143" duration="18646000" />
+      <workItem from="1601706407225" duration="627000" />
+      <workItem from="1602298573647" duration="10173000" />
     </task>
     <task id="LOCAL-00001" summary=":art:&#9;新增状态码信息接口，用户登陆完成">
       <created>1592034738784</created>
@@ -467,7 +459,14 @@
       <option name="project" value="LOCAL" />
       <updated>1600784946243</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary=":sparkles: 增加部分相关日志记录，修正日志问题">
+      <created>1601640338421</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1601640338421</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -511,7 +510,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="merge" />
     <MESSAGE value=":art:&#9;新增状态码信息接口，用户登陆完成" />
     <MESSAGE value=":art: 优化oss接口，token接入至缓存" />
     <MESSAGE value=":art:&#9;剥离公共配置读取方式 可配置" />
@@ -536,65 +534,62 @@
     <MESSAGE value=":sparkles: 账单服务接口同步完成" />
     <MESSAGE value=":art: 修改权限设置 逻辑删除改为物理删除；账单查询groupby 维度优化" />
     <MESSAGE value=":art: dashboard 展示返回数据优化" />
-    <option name="LAST_COMMIT_MESSAGE" value=":art: dashboard 展示返回数据优化" />
+    <MESSAGE value=":sparkles: 增加部分相关日志记录，修正日志问题" />
+    <option name="LAST_COMMIT_MESSAGE" value=":sparkles: 增加部分相关日志记录，修正日志问题" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="305" y="103" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593350567726">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="305" y="103" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1593350567726" />
     <state x="704" y="356" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog" timestamp="1600828235722">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="704" y="356" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1600828235722" />
-    <state x="560" y="107" width="800" height="933" key="CommitChangelistDialog2" timestamp="1600784941314">
+    <state x="560" y="107" width="804" height="933" key="CommitChangelistDialog2" timestamp="1601640329249">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="560" y="107" width="800" height="933" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1600784941314" />
+    <state x="560" y="107" width="804" height="933" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1601640329249" />
     <state x="696" y="224" key="FileChooserDialogImpl" timestamp="1600828232807">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="696" y="224" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1600828232807" />
-    <state width="1876" height="276" key="GridCell.Tab.0.bottom" timestamp="1601638155015">
+    <state width="1876" height="247" key="GridCell.Tab.0.bottom" timestamp="1602329702966">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="276" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1601638155015" />
-    <state width="1876" height="276" key="GridCell.Tab.0.center" timestamp="1601638155014">
+    <state width="1876" height="247" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602329702966" />
+    <state width="1876" height="247" key="GridCell.Tab.0.center" timestamp="1602329702965">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="276" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1601638155014" />
-    <state width="1876" height="276" key="GridCell.Tab.0.left" timestamp="1601638155014">
+    <state width="1876" height="247" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602329702965" />
+    <state width="1876" height="247" key="GridCell.Tab.0.left" timestamp="1602329702965">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="276" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1601638155014" />
-    <state width="1876" height="276" key="GridCell.Tab.0.right" timestamp="1601638155014">
+    <state width="1876" height="247" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602329702965" />
+    <state width="1876" height="247" key="GridCell.Tab.0.right" timestamp="1602329702966">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="276" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1601638155014" />
-    <state width="1876" height="491" key="GridCell.Tab.1.bottom" timestamp="1600741601907">
+    <state width="1876" height="247" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602329702966" />
+    <state width="1876" height="491" key="GridCell.Tab.1.bottom" timestamp="1602298582421">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="491" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1600741601907" />
-    <state width="1876" height="491" key="GridCell.Tab.1.center" timestamp="1600741601907">
+    <state width="1876" height="491" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1602298582421" />
+    <state width="1876" height="491" key="GridCell.Tab.1.center" timestamp="1602298582420">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="491" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1600741601907" />
-    <state width="1876" height="491" key="GridCell.Tab.1.left" timestamp="1600741601907">
+    <state width="1876" height="491" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1602298582420" />
+    <state width="1876" height="491" key="GridCell.Tab.1.left" timestamp="1602298582420">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="491" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1600741601907" />
-    <state width="1876" height="491" key="GridCell.Tab.1.right" timestamp="1600741601907">
+    <state width="1876" height="491" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1602298582420" />
+    <state width="1876" height="491" key="GridCell.Tab.1.right" timestamp="1602298582421">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="491" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1600741601907" />
+    <state width="1876" height="491" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1602298582421" />
     <state x="521" y="12" width="998" height="708" key="SettingsEditor" timestamp="1600953909931">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="521" y="12" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1600953909931" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1600785014831">
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1601640349291">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1600785014831" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1601640349291" />
     <state x="744" y="311" key="git4idea.merge.GitMergeDialog" timestamp="1594970776987">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -603,10 +598,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="646" y="311" key="git4idea.merge.GitPullDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1600062495641" />
-    <state x="556" y="218" width="807" height="820" key="search.everywhere.popup" timestamp="1601630173825">
+    <state x="556" y="218" width="807" height="820" key="search.everywhere.popup" timestamp="1602311456872">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="556" y="218" width="807" height="820" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1601630173825" />
+    <state x="556" y="218" width="807" height="820" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1602311456872" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
