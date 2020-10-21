@@ -46,6 +46,7 @@ class login_out(models.Model):
     traceId = models.CharField(max_length=100,verbose_name='登陆时 产生一个traceId')
     username = models.CharField(max_length=100,verbose_name='用户名')
     status = models.BooleanField(verbose_name='登陆状态 0-失败 1-成功')
+    ipAdress = models.GenericIPAddressField(verbose_name='请求IP地址')
     osType = models.CharField(max_length=200, verbose_name='操作系统类型')
     broswerType = models.CharField(max_length=100, verbose_name='浏览器类型')
     broswerVersion = models.CharField(max_length=100, verbose_name='浏览器版本')

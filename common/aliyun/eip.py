@@ -190,6 +190,7 @@ def  syncEip(data):
 
     getdatalist = response['EipAddresses']['EipAddress']
     getdatacount = response['TotalCount']
+    eipList=[]
     for i in range(getdatacount):
         perdata = getdatalist[i]
         # 判断ISP类型
@@ -218,6 +219,8 @@ def  syncEip(data):
             internetChargeType=0 #带宽付费
         else:
             internetChargeType=1 #流量付费
+
+        eipList.append(perdata['InstanceId'])
         object,created = cmdbmodels.eip.objects.update_or_create(allocationId=perdata['AllocationId'],
                                                 defaults={'regionId':perdata['RegionId'],
                                                           'allocationId':perdata['AllocationId'],
@@ -234,7 +237,8 @@ def  syncEip(data):
                                                               perdata['AllocationTime'],
                                                               "%Y-%m-%dT%H:%M:%SZ")})
 
-
+        # 这里需要注意 前提条件 在同一regionId的情况下
+    cmdbmodels.eip.objects.filter(regionId=perdata['RegionId']).exclude(instanceId__in=eipList).delete()
     res = cmdbmodels.eip.objects.all().values()
     settings.RESULT['code'] = 2001
     settings.RESULT['msg'] = 'success'

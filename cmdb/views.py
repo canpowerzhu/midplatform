@@ -5,7 +5,7 @@ from common import baseconfig
 from common.logconf import  get_log_insert
 from midplatform import settings
 from cmdb import models as cmdbmodels
-
+from common.aliyun import  instance
 accesskeyId = baseconfig.getconfig()['accessKey']
 accessSecret = baseconfig.getconfig()['accessSecret']
 
@@ -139,12 +139,12 @@ def asset(request):
         if (action == 0 and cur_ecs_status == 0) or (
                 action == 1 and cur_ecs_status == 3) or (
                 action == 2 and cur_ecs_status == 0):
-            # modifyres = instance.InstanceStatus(res.values('regionId').first()['regionId'], InstanceId, action)
+            modifyres = instance.InstanceStatus(res.values('regionId').first()['regionId'], InstanceId, action)
             # 上述完成后我们要去更新数据库数据
-            info = "实例" + InstanceId +  "状态更改为" + action
+            info = "实例" + InstanceId +  "状态更改为" + str(action)
             get_log_insert.logrecord(1, request, {'msg': info})
-            print(InstanceId, action)
-            # cmdbmodels.asset.objects.filter(instanceId=InstanceId).update(status=modifyres)
+            print(InstanceId, action,modifyres)
+            cmdbmodels.asset.objects.filter(instanceId=InstanceId).update(status=modifyres)
             settings.RESULT['code'] = 2001
             settings.RESULT['msg'] = 'success'
             settings.RESULT['data'] = '操作成功'
@@ -158,7 +158,20 @@ def asset(request):
     if request.method == 'GET' or request.method == 'get':
         limit = request.GET.get('limit')
         page = request.GET.get('page')
-        res = cmdbmodels.asset.objects.all().values()
+        kwargs={}
+        instanceName = request.GET.get('instanceName')
+        publicIp = request.GET.get('publicIp')
+
+        if publicIp:
+            kwargs['publicIp'] = publicIp
+
+        if instanceName:
+            kwargs['instanceName'] = instanceName
+
+        if (not publicIp) and (not instanceName):
+            res = cmdbmodels.asset.objects.all().values()
+        else:
+            res = cmdbmodels.asset.objects.filter(**kwargs).values()
         assetlist = Paginator(res, limit)  # 进行分页
         page_asset = assetlist.page(page)  # 返回对应页码
         settings.RESULT['code'] = 2001

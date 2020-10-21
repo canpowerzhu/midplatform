@@ -29,15 +29,17 @@ def syncregion(resqBody):
 
         # 判断实例网络类型 是vpc还是经典网络
         if instanceInfo['InstanceNetworkType'] == 'vpc':
-            ipType = 1
+
             instanceNetworkType = 1
             privateIp = instanceInfo['VpcAttributes']['PrivateIpAddress']['IpAddress'][0]
             # 判断公网IP 是弹性IP 还是公网IP
             if len(instanceInfo['EipAddress']['IpAddress']) > 0:
                 publicIp = instanceInfo['EipAddress']['IpAddress']
+                ipType = 1
             else:
                 publicIp = instanceInfo['PublicIpAddress']['IpAddress'][0]
-
+                ipType = 0
+            print(publicIp)
 
         else:
             ipType = 0
@@ -67,7 +69,7 @@ def syncregion(resqBody):
                                                             'hostname': instanceInfo['HostName'],
                                                             'regionId': instanceInfo['RegionId'],
                                                             'status': instance.ecsstatusdict[
-                                                                instanceInfo['Status']],
+                                                            instanceInfo['Status']],
                                                             'keyPairName': KeyPairName,
                                                             'tagKey': tagKey,
                                                             'tagValue': tagValue,

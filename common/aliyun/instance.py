@@ -58,26 +58,18 @@ def InstanceStatus(regionId,instanceId,type):
         2:RebootInstanceRequest
     }
     client = AcsClient(accesskeyId, accessSecret, regionId)
-    print(typedict[int(type)])
     request = typedict[int(type)]()
-
-
-
-
     request.set_accept_format('json')
-
     request.set_InstanceId(instanceId)
-
-
     response = client.do_action_with_exception(request)
     print(str(response, encoding='utf-8'))
     #获取实例状态
     import time
-    time.sleep(5)
+    time.sleep(60)
     getInstanceInfo = DescribeInstanceAttributeRequest()
     getInstanceInfo.set_accept_format('json')
     getInstanceInfo.set_InstanceId(instanceId)
     ecsstatus = json.loads(client.do_action_with_exception(getInstanceInfo))
-    print(ecsstatus)
+    print("ecsstatus %s" %ecsstatus )
 
-    return 0
+    return ecsstatusdict[ecsstatus["Status"]]

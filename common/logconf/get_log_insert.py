@@ -49,6 +49,7 @@ def logrecord(type, request, data):
         logmodels.login_out.objects.create(traceId=data['traceId'],
                                            username=operateUser,
                                            status=actionstatus,
+                                           ipAdress=ip.split(',')[1],
                                            osType=request.META['OS'],
                                            broswerType=BroswerType,
                                            broswerVersion=BroswerVersion,
