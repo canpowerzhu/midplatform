@@ -10,16 +10,27 @@ from django.db import models
 class deployRecord(models.Model):
     stateChoice =(
         (0,'未处理'),
-        (1,'失败'),
-        (2,'成功'),
+        (1,'处理中'),
+        (2,'失败'),
+        (3,'成功'),
     )
     cacheChoice = (
         (0,'未修改'),
         (1,'修改'),
     )
 
+    deploymethod = (
+        (0,'手动发布'),
+        (1,'自动发布'),
+        (2, '定时发布'),
+        (3, '灰度发布'),
+        (4, '预约发布'),
+    )
+
     projectName = models.CharField(max_length=200, verbose_name="项目名称")
     isRollBack = models.BooleanField(verbose_name="是否可以回滚")
+    deployMethod = models.IntegerField(default=0,choices=deploymethod, verbose_name="发布方式 0-手动发布 1-即刻发布 2-定时发布 3-灰度发布 4-预约发布")
+    timerInfo = models.DateTimeField(blank=True, null=True,verbose_name='定时发布的时间')
     modifyModel = models.CharField(max_length=1024, verbose_name="更新哪些模块")
     modifyContent = models.TextField(max_length=5120, verbose_name="更新的内容")
     remark = models.TextField(max_length=5120, verbose_name="增加备注")

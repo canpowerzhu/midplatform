@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^dingrecord/', views.dingrecord),
     url(r'^issuerecord/', views.issuerecord),
     url(r'^issuerecordpic/', views.issuerecordpic),
+    url(r'^getrecordanalyse/', views.getrecordanalyse),
 ]

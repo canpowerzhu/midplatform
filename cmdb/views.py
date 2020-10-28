@@ -156,8 +156,8 @@ def asset(request):
         return JsonResponse(settings.RESULT)
 
     if request.method == 'GET' or request.method == 'get':
-        limit = request.GET.get('limit')
-        page = request.GET.get('page')
+        limit = request.GET.get('limit',default=200)
+        page = request.GET.get('page',default=1)
         kwargs={}
         instanceName = request.GET.get('instanceName')
         publicIp = request.GET.get('publicIp')

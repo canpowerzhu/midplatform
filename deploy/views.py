@@ -7,12 +7,58 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.db.models import Max
+from django.db.models import Count,Sum
 import datetime
 
 
 ##发布记录包含四个接口： addrecord、editrecord、getallrecord
 #
 #
+def getrecordanalyse(request):
+    action = request.GET.get('action')
+    kwdict = {
+        0: '未处理',
+        1: '处理中',
+        2: '失败',
+        3: '成功',
+    }
+    if  action == '0':
+
+        process = models.deployRecord.objects.filter(
+            deployTime__year=datetime.datetime.now().year, deployTime__month=datetime.datetime.now().month, state__in=[1,2,3]).values(
+            'state', 'projectName').annotate(num=Count('projectName'))
+        for i in list(process):
+            i['state'] = kwdict[i['state']]
+    elif action == '1':
+        process = models.deployRecord.objects.values('state').annotate(num=Count('state'))
+        for i in list(process):
+            i['state'] = kwdict[i['state']]
+    else:
+        kvdict={
+            0: '手动发布',
+            1: '自动发布',
+            2: '定时发布',
+            3: '灰度发布',
+            4: '预约发布',
+        }
+        getcurmonth = models.deployRecord.objects.filter(
+            deployTime__year=datetime.datetime.now().year, deployTime__month=datetime.datetime.now().month)
+        count=getcurmonth.count()
+        process=getcurmonth.values(
+            'deployMethod').annotate(num=Count('deployMethod'))
+        for i in list(process):
+            i['deployMethod'] = kvdict[i['deployMethod']]
+            i['percent'] = round(i['num']/count,3)
+
+
+    settings.RESULT['code'] = 2001
+    settings.RESULT['msg'] = 'success'
+    settings.RESULT['data'] = list(process)
+    return  JsonResponse(settings.RESULT)
+
+
+
+
 def getallrecord(request):
     kwargs = {
         # 动态查询的字段
@@ -74,6 +120,14 @@ def addrecord(request):
         kwargs = {
             ##动态参数
         }
+
+        if res['deployMethod'] == 2:
+            localtime = datetime.datetime.strptime(res['timerInfo'], "%Y-%m-%dT%H:%M:%S.%fZ") + datetime.timedelta(
+                hours=8)
+            kwargs['deployMethod'] = 2
+            kwargs['timerInfo'] = datetime.datetime.strftime(localtime ,'%Y-%m-%d %H:%M:%S')
+
+
         if res['isModifyCache'] == 1:
             kwargs['isModifyCache'] = 1
             kwargs['cacheDetail'] = res['cacheDetail']
@@ -118,7 +172,6 @@ def editrecord(request):
     # 测试步骤
 
     curstep = models.deployRecord.objects.filter(pk=res['id']).values('step').first()['step']
-    print(curstep, res['step'])
     if res['step'] < int(curstep):
         settings.RESULT['code'] = 20091
         settings.RESULT['msg'] = 'fail'
@@ -351,15 +404,6 @@ def issuerecord(request):
         return JsonResponse(settings.RESULT)
 
     if request.method == 'GET' or request.method == 'get':
-        # 这里有列表详情，和文章详情 依据是否有id判断
-        # recordId = request.GET.get('recordId')
-        # if recordId != None:
-        #     data=models.issueRecord.objects.filter(pk=recordId).values().first()
-        #     print(data)
-        #     settings.RESULT['data'] = data
-        #     settings.RESULT['code'] =2001
-        #     settings.RESULT['msg'] = 'success'
-        #     return JsonResponse(settings.RESULT)
         id = request.GET.get('recordId')
         if id == None:
             # 查询列表
