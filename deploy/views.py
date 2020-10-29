@@ -252,8 +252,8 @@ def dingtalkmsg(data, type):
     headers = {'Content-Type': 'application/json;charset=utf-8'}
     logo = ossurl + models.projectName.objects.values('projectLogo').filter(projectName=data['projectName']).first()[
         'projectLogo']
-    # projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()['projectHook']
-    projecthook = '75e709c1a28e4d79d3ab6643ef5923d9409af252ca6cd3ed52dc4da40b1e98fc'
+    projecthook = models.projectName.objects.values('projectHook').filter(projectName=data['projectName']).first()['projectHook']
+    # projecthook = '75e709c1a28e4d79d3ab6643ef5923d9409af252ca6cd3ed52dc4da40b1e98fc'
     api_url = "https://oapi.dingtalk.com/robot/send?access_token=" + projecthook
 
     # 获取该项目的项目经理用户ID
