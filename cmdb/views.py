@@ -258,7 +258,7 @@ def billmonth(request):
         billingCycle = resqBody['billingCycle']
         respdata = bill.syncMonthBill(billingCycle, pagesize)
         info = "同步" + billingCycle  + "的账单"
-        get_log_insert.logrecord(1, request, {'msg': info})
+        # get_log_insert.logrecord(1, request, {'msg': info})
         return JsonResponse(respdata)
 
 
@@ -275,6 +275,8 @@ def billmonth(request):
         billingPeriod = request.GET.get('billingPeriod')
         if billingPeriod:
             allperiod = billingPeriod
+            dttemp = datetime.datetime.strptime(billingPeriod, '%Y-%m')
+            lastPeriod = dttemp.replace(month=dttemp.month - 1).strftime("%Y-%m")
         else:
             allperiod = defaultPeriod
             lastPeriod = lastPeriod

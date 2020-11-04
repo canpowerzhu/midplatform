@@ -198,6 +198,7 @@ def getproname(request):
 def getmodelname(request):
     final_data = {"code": 2001, "msg": "success", "data": None}
     proname = request.GET.get('proname')
+    print(proname)
     data = {}
     res = models.projectName.objects.values('projectModel').filter(projectName=proname).first()['projectModel'].split(',')
     for i in res:

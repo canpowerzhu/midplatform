@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^project/', include("project.urls")),
     url(r'^mophealth/', include("mophealth.urls")),
     url(r'^cmdb/', include("cmdb.urls")),
+    url(r'^ansibletower/', include("ansibletower.urls")),
 
 ]

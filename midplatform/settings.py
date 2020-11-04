@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'sysconf.apps.SysconfConfig',
     'mophealth.apps.MophealthConfig',
     'cmdb.apps.CmdbConfig',
+    'ansibletower.apps.AnsibletowerConfig',
 
 ]
 

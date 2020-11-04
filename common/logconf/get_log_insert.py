@@ -19,7 +19,8 @@ def logrecord(type, request, data):
 
     import datetime, json
     from common import checklogin
-
+    print(request.META)
+    print(request.META['OS'])
     BroswerType = request.user_agent.browser.family
 
     BroswerVersion = ".".join(str(i) for i in list(request.user_agent.browser.version))
@@ -50,7 +51,7 @@ def logrecord(type, request, data):
                                            username=operateUser,
                                            status=actionstatus,
                                            ipAdress=ip.split(',')[1],
-                                           osType=request.META['OS'],
+                                           osType=request.META['HTTP_USER_AGENT'].split('(')[1].split(')')[0],
                                            broswerType=BroswerType,
                                            broswerVersion=BroswerVersion,
                                            userAgent=request.META['HTTP_USER_AGENT'],
@@ -66,7 +67,7 @@ def logrecord(type, request, data):
                                             msg=data['msg'],
                                             status=1,
                                             method=request.method,
-                                            ipAdress=ip.split(',')[1],
+                                            ipAdress=ip.split(',')[0],
                                             params=reqBody,
                                             requestTime=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 

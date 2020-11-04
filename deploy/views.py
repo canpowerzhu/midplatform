@@ -136,7 +136,7 @@ def addrecord(request):
             kwargs['isModifySql'] = 1
             kwargs['sqlDetail'] = res['sqlDetail']
 
-        if res['remark'] != None:
+        if 'remark' in res.keys():
             kwargs['remark'] = res['remark']
 
         kwargs['projectName'] = res['projectName']
