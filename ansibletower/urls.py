@@ -6,6 +6,7 @@ from ansibletower import views
 
 
 urlpatterns = [
-    url(r'^configlist/', views.configlist),
+    url(r'^configinfo/', views.configinfo),
+    url(r'^configtree/', views.configtree),
 
 ]
