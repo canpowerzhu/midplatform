@@ -292,8 +292,10 @@ def billmonth(request):
                 for i in list(res):
                     lastcost = cmdbmodels.billDetail.objects.filter(resourceGroup=i['resourceGroup'],billingCycle=lastPeriod+'-01').aggregate(nums=Sum('pretaxAmount',output_field=FloatField()))
                     i['lastcost'] = lastcost['nums']
-                    i['rate'] = round((i['total'] - lastcost['nums'])/lastcost['nums'],2)
-
+                    if lastcost['nums'] == None:
+                        i['rate'] = 0.00
+                    else:
+                        i['rate'] = round((i['total'] - lastcost['nums'])/lastcost['nums'],2)
             elif groupName == 'productDetail':
                 res = cmdbmodels.billDetail.objects.filter(billingCycle=allperiod + '-01').values('productDetail','billingCycle').annotate(
                     total=Sum('pretaxAmount', output_field=FloatField())).order_by('-total')
