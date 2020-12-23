@@ -12,3 +12,10 @@ def getconfig():
         configDic[kv[0]]=kv[1]
 
     return configDic
+
+
+
+def getnickname(id):
+    nickname = models.sys_user.objects.filter(pk=id).values('nickname').first()['nickname']
+    # print(nickname)
+    return nickname

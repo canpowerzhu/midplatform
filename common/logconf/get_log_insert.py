@@ -19,8 +19,7 @@ def logrecord(type, request, data):
 
     import datetime, json
     from common import checklogin
-    print(request.META)
-    print(request.META['OS'])
+
     BroswerType = request.user_agent.browser.family
 
     BroswerVersion = ".".join(str(i) for i in list(request.user_agent.browser.version))

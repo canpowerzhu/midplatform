@@ -155,7 +155,7 @@ def addrecord(request):
         front_respone['msg'] = 'success'
         res['tester'] = testname
         res['id'] = get_res['id__max']
-        dingtalkmsg(res, 0)
+        # dingtalkmsg(res, 0)
         return JsonResponse(front_respone)
 
 
@@ -217,7 +217,7 @@ def editrecord(request):
 
     models.deployRecord.objects.filter(pk=res['id']).update(**kwargs)
     data = model_to_dict(models.deployRecord.objects.get(pk=res['id']))
-    dingtalkmsg(data, stepinfo)
+    # dingtalkmsg(data, stepinfo)
     return JsonResponse(settings.RESULT)
 
 
