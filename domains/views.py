@@ -189,8 +189,10 @@ def domainsync(request):
     account_token = list(models.Domainaccount.objects.filter(pk=id).values_list('username','token').first())
     account = account_token[0]
     token = account_token[1]
+    print(account,token)
     s.auth = (account, token)
     res = s.get(url=api_url)
+    print('ddd' + str(res.status_code))
     if res.status_code == 200:
         domainresult = res.content.decode('utf-8')
 
