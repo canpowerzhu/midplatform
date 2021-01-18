@@ -9,11 +9,13 @@ from django.core.paginator import Paginator
 from django.db.models import Max
 from django.db.models import Count,Sum
 import datetime
+from common import  checklogin
 
 
 ##发布记录包含四个接口： addrecord、editrecord、getallrecord
 #
 #
+# @checklogin.is_login
 def getrecordanalyse(request):
     action = request.GET.get('action')
     kwdict = {
