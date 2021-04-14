@@ -22,7 +22,7 @@ coreschema==0.0.4
 crcmod==1.7
 cryptography==2.8
 dateutils==0.6.12
-Django==1.11.14
+Django==1.11.29
 django-cors-headers==3.2.1
 django-jsonfield==1.4.0
 django-mirage-field==1.0.1
