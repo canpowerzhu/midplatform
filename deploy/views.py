@@ -11,7 +11,7 @@ from django.db.models import Count,Sum
 import datetime
 from common import  checklogin
 
-
+# test
 ##发布记录包含四个接口： addrecord、editrecord、getallrecord
 #
 #
