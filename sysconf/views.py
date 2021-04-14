@@ -38,10 +38,12 @@ def getrouter(request):
             'parentId', 'path', 'redirect',
             'routerName', 'target', 'title',
             'type', 'code').order_by('sort')
+        print(list(router))
         settings.RESULT['count'] = router.count()
         settings.RESULT['code'] = 2001
         settings.RESULT['msg'] = 'success'
         settings.RESULT['data'] = list(router)
+        print(settings.RESULT)
         return JsonResponse(settings.RESULT)
 
 
@@ -401,7 +403,7 @@ def sysuserlogin(request):
 
         ###获取用户对应角色的权限
         user_role_id = model_to_dict(models.sys_user_role.objects.filter(user_id=int(info['id'])).first())['role_id']
-
+        print(user_role_id)
         user_persssions_id = list(
             models.sys_role_menu.objects.filter(role_id=user_role_id).values_list('permission_id', flat=True))
 
@@ -422,7 +424,7 @@ def sysuserlogin(request):
 
         get_log_insert.logrecord(0,request, {'username':param_dict['username'],'action':1,'status':1,'traceId':traceId})
         return JsonResponse({'code': 2001, 'msg': 'success', 'data': settings.loginDic})
-    get_log_insert.logrecord(0, request, {'username': param_dict['username'], 'action':1,'status':0})
+    get_log_insert.logrecord(0, request, {'username': param_dict['username'], 'action':1,'status':0,'traceId':'null'})
     return JsonResponse({'code': 2004, 'msg': 'fail', 'data': '密码错误'})
 
 

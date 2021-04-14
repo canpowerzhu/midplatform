@@ -11,6 +11,7 @@ aliyun-python-sdk-vpc==3.0.11
 amqp==2.6.0
 anyjson==0.3.3
 APScheduler==3.6.3
+arrow==0.17.0
 asgiref==3.2.7
 AxmlParserPY==0.0.3
 billiard==3.6.3.0
@@ -20,6 +21,7 @@ chardet==3.0.4
 coreschema==0.0.4
 crcmod==1.7
 cryptography==2.8
+dateutils==0.6.12
 Django==1.11.14
 django-cors-headers==3.2.1
 django-jsonfield==1.4.0
@@ -47,6 +49,7 @@ public==2019.4.13
 pycparser==2.20
 pycryptodome==3.9.7
 PyMySQL==0.9.3
+python-dateutil==2.8.1
 pytz==2019.3
 query-string==2019.4.13
 redis==3.4.1

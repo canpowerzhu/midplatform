@@ -5,7 +5,7 @@ import json
 from midplatform import settings
 import datetime
 from project.models import projectName
-from common import ossupload
+from common import ossupload,baseconfig
 from django.core.paginator import Paginator
 
 
@@ -65,19 +65,22 @@ def baseinfo(request):
 
     if request.method == 'POST' or request.method == 'post':
         res = json.loads(request.body.decode('utf-8'))
-        uploadPic = ossupload.uploadBase64Pic(res['projectLogo'], res['projectName'],'')
+        print(res['projectLogo'])
+        if not res['projectLogo'] == '':
+            uploadPic = ossupload.uploadBase64Pic(res['projectLogo'], res['projectName'],'')
+        else:
+            uploadPic = 'midplatform/projectlogo/moppo.png'
         front_respone = {'code': None, 'msg': None}
 
         try:
-
             models.projectName.objects.create(projectName=res['projectName'],
                                               projectModel=res['projectModel'],
                                               status=res['status'],
                                               projectHook=res['projectHook'],
-                                              projectOwner=res['projectOwnerId'],
+                                              projectOwner=baseconfig.getnickname(res['projectOwnerId']),
                                               projectOwnerId=res['projectOwnerId'],
-                                              opsOwnerId=res['projectOwnerId'],
-                                              opsOwner=res['projectOwnerId'],
+                                              opsOwnerId=res['opsOwnerId'],
+                                              opsOwner=baseconfig.getnickname(res['opsOwnerId']),
                                               projectLogo=uploadPic)
         except Exception as e:
             front_respone['code'] = 2002
@@ -198,6 +201,7 @@ def getproname(request):
 def getmodelname(request):
     final_data = {"code": 2001, "msg": "success", "data": None}
     proname = request.GET.get('proname')
+    print(proname)
     data = {}
     res = models.projectName.objects.values('projectModel').filter(projectName=proname).first()['projectModel'].split(',')
     for i in res:
