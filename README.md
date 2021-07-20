@@ -12,3 +12,7 @@
 - Dockerfile dockerfile文件 用于构建镜像
 - run.sh  启动脚本
 - requirement.txt 依赖包
+
+
+## tips
+由于本项目聚合在一起，更新比较笨重，故本工程无重大问题，不在更新
