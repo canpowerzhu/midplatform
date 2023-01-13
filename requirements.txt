@@ -20,7 +20,7 @@ cffi==1.14.0
 chardet==3.0.4
 coreschema==0.0.4
 crcmod==1.7
-cryptography==2.8
+cryptography==3.3.2
 dateutils==0.6.12
 Django==1.11.14
 django-cors-headers==3.2.1
